@@ -71,7 +71,6 @@ const CliCommand = {
 };
 
 const ExitCode = {
-  SUCCESS: 0,
   FATAL_EXCEPTION: 1
 };
 

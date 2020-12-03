@@ -45,7 +45,6 @@ const writeOffers = async (offers) => {
     }
 
     console.info(`Данные в количестве [${offers.length}] успешно сформированы в файл ${MOCK_FILE_NAME}`);
-    process.exit(ExitCode.SUCCESS);
   });
 };
 
@@ -58,7 +57,7 @@ module.exports = {
 
     if (countOffer > MAX_MOCK_ITEMS) {
       console.info(`Не больше ${MAX_MOCK_ITEMS} объявлений`);
-      process.exit(ExitCode.SUCCESS);
+      return;
     }
 
     const offers = generateOffers(countOffer);

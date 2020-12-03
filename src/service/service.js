@@ -2,8 +2,7 @@
 
 const {
   DEFAULT_CLI_COMMAND,
-  USER_ARGV_INDEX,
-  ExitCode
+  USER_ARGV_INDEX
 } = require(`../constans`);
 
 const {Cli} = require(`./cli`);
@@ -13,7 +12,7 @@ const [userCommand] = userArgs;
 
 if (userArgs.length === 0 || !Cli[userCommand]) {
   Cli[DEFAULT_CLI_COMMAND].run();
-  process.exit(ExitCode.SUCCESS);
+  return;
 }
 
 const commandArgs = userArgs.slice(1);

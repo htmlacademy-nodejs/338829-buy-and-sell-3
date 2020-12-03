@@ -1,6 +1,6 @@
 'use strict';
 
-const packageJsonFile = require(`../../../package-lock.json`);
+const packageJsonFile = require(`../../../package.json`);
 const {CliCommand} = require(`../../constans`);
 
 const getVersion = () => {
