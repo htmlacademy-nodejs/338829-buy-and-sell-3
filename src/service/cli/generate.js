@@ -51,7 +51,7 @@ const writeOffers = async (offers) => {
 const readContent = async (filePath) => {
   try {
     const content = await fs.readFile(filePath, `utf-8`);
-    return content.split(`\n`);
+    return content.trim().split(`\n`);
   } catch (error) {
     console.info(chalk.red(error));
     return [];
@@ -71,9 +71,9 @@ module.exports = {
     }
 
     const [categories, sentences, titles] = await Promise.all([
-      await readContent(FILE_CATEGORIES_PATH),
-      await readContent(FILE_SENTENCES_PATH),
-      await readContent(FILE_TITLES_PATH),
+      readContent(FILE_CATEGORIES_PATH),
+      readContent(FILE_SENTENCES_PATH),
+      readContent(FILE_TITLES_PATH),
     ]);
 
     const offers = generateOffers({
