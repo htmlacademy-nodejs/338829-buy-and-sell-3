@@ -15,6 +15,7 @@ const helpText = `
     ${CliCommand.VERSION}:            выводит номер версии
     ${CliCommand.HELP}:               печатает этот текст
     ${CliCommand.GENERATE} <count>    формирует файл ${FILE_MOCK_PATH}
+    ${CliCommand.SERVER}   <port>     запускает http сервер
 `;
 
 module.exports = {

@@ -20,7 +20,8 @@ const {
 
 const {
   getRandomInt,
-  shuffle
+  shuffle,
+  checkNumParam
 } = require(`../../utils`);
 
 const getPictureFileName = (number) => {
@@ -62,8 +63,7 @@ module.exports = {
   name: CliCommand.GENERATE,
   async run(args = []) {
     const [userCount] = args;
-    const count = Number.parseInt(userCount, 10);
-    const countOffer = count && count > 0 ? count : DEFAULT_GENERATE_COUNT;
+    const countOffer = checkNumParam(userCount, DEFAULT_GENERATE_COUNT);
 
     if (countOffer > MAX_MOCK_ITEMS) {
       console.info(chalk.red(`Не больше ${MAX_MOCK_ITEMS} объявлений`));
