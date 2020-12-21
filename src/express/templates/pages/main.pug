@@ -1,0 +1,17 @@
+extends ../layout
+
+block content
+  main.page-content
+    include ../partials/categories
+    section.tickets-list
+      h2.visually-hidden Самые новые предложения
+      .tickets-list__wrapper
+        .tickets-list__header
+          p.tickets-list__title Самое свежее
+        include ../partials/tickets-new
+    section.tickets-list
+      h2.visually-hidden Самые обсуждаемые предложения
+      .tickets-list__wrapper
+        .tickets-list__header
+          p.tickets-list__title Самые обсуждаемые
+        include ../partials/tickets-top
