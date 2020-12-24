@@ -1,11 +1,10 @@
 'use strict';
 
 const chalk = require(`chalk`);
-const http = require(`http`);
-const fs = require(`fs`).promises;
+const express = require(`express`);
+const offersRouter = require(`../routes/offers`);
 
 const {
-  FILE_MOCK_PATH,
   DEFAULT_PORT,
   CliCommand,
   HttpCode
@@ -14,59 +13,21 @@ const {
 const {checkNumParam} = require(`../../utils`);
 
 const startHttpServer = (port) => {
-  http.createServer(onClientConnect)
-    .listen(port)
-    .on(`listening`, (err) => {
-      if (err) {
-        return console.info(chalk.red(`[http]: Ошибка при создании сервера`, err));
-      }
+  const app = express();
+  app.use(express.json());
+  app.use(`/offers`, offersRouter);
 
-      return console.info(chalk.green(`[http]: Ожидаю соединений на ${port}`));
-    });
-};
-
-const onClientConnect = async (req, res) => {
-  const sendNotFound = () => {
-    sendResponse(res, HttpCode.NOT_FOUND, `<h1>Not found</h1>`);
-  };
-
-  switch (req.url) {
-    case `/`:
-      try {
-        const content = await fs.readFile(FILE_MOCK_PATH, `utf-8`);
-        const mocks = JSON.parse(content);
-
-        const template = mocks.map((post) => `<li>${post.title}</li>`).join(``);
-        sendResponse(res, HttpCode.OK, `<ul>${template}</ul>`);
-      } catch (error) {
-        console.info(chalk.red(error));
-        sendNotFound();
-      }
-      break;
-
-    default:
-      sendNotFound();
-      break;
-  }
-};
-
-const sendResponse = (res, statusCode, template) => {
-  const html = (`
-    <!Doctype html>
-      <html lang="ru">
-      <head>
-        <title>Node Http Server</title>
-      </head>
-      <body>${template}</body>
-    </html>
-  `).trim();
-
-  res.statusCode = statusCode;
-  res.writeHead(statusCode, {
-    'Content-Type': `text/html; charset=UTF-8`,
+  app.use((req, res) => {
+    res.status(HttpCode.NOT_FOUND).send(`Not found`);
   });
 
-  res.end(html);
+  app.use((err, req, res, _next) => {
+    res.status(HttpCode.INTERNAL_SERVER_ERROR).send(`Server error`);
+  });
+
+  app.listen(port, () => {
+    console.info(chalk.green(`[Api]: Ожидаю соединений на ${port}`));
+  });
 };
 
 module.exports = {
