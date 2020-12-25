@@ -16,7 +16,7 @@ const {
   PictureRestrict,
   SentencesRestrict,
   ExitCode
-} = require(`../../constans`);
+} = require(`../../constants`);
 
 const {
   getRandomInt,

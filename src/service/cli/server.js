@@ -8,7 +8,7 @@ const {
   DEFAULT_PORT,
   CliCommand,
   HttpCode
-} = require(`../../constans`);
+} = require(`../../constants`);
 
 const {checkNumParam} = require(`../../utils`);
 

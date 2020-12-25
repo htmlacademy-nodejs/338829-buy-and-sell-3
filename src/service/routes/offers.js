@@ -3,7 +3,7 @@
 const fs = require(`fs`).promises;
 const {Router} = require(`express`);
 
-const {FILE_MOCK_PATH} = require(`../../constans`);
+const {FILE_MOCK_PATH} = require(`../../constants`);
 
 const offersRouter = new Router();
 offersRouter.get(`/`, async (req, res) => {

@@ -3,7 +3,7 @@
 const {
   DEFAULT_CLI_COMMAND,
   USER_ARGV_INDEX
-} = require(`../constans`);
+} = require(`../constants`);
 
 const {Cli} = require(`./cli`);
 

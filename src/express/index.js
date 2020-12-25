@@ -7,7 +7,7 @@ const {
   DEFAULT_EXPRESS_PORT,
   EXPRESS_PUBLIC_DIR,
   HttpCode
-} = require(`../constans`);
+} = require(`../constants`);
 
 const rootRouter = require(`./routes/root`);
 const offersRouter = require(`./routes/offers`);

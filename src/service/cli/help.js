@@ -3,7 +3,7 @@ const chalk = require(`chalk`);
 const {
   CliCommand,
   FILE_MOCK_PATH
-} = require(`../../constans`);
+} = require(`../../constants`);
 
 const helpText = `
 Программа запускает http-сервер и формирует файл с данными для API.

@@ -2,7 +2,7 @@
 
 const chalk = require(`chalk`);
 const packageJsonFile = require(`../../../package.json`);
-const {CliCommand} = require(`../../constans`);
+const {CliCommand} = require(`../../constants`);
 
 const getVersion = () => {
   return packageJsonFile.version;
