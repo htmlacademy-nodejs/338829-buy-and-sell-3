@@ -1,0 +1,44 @@
+GET http://localhost:3000/api/offers
+###
+GET http://localhost:3000/api/offers/3DD_SH
+###
+GET http://localhost:3000/api/offers/1
+###
+DELETE http://localhost:3000/api/offers/rFVOIO
+###
+GET http://localhost:3000/api/offers/Msdbj0
+###
+POST http://localhost:3000/api/offers
+content-type: application/json
+
+{
+    "name": "test"
+}
+###
+POST http://localhost:3000/api/offers
+content-type: application/json
+
+{
+    "picture": "test",
+    "title": "Продам гараж",
+    "description": "Любые проверки на месте. Пользовались 2-3 раза",
+    "category": [
+      "Авто"
+    ],
+    "sum": 1000,
+    "type": "OFFER"
+}
+###
+PUT  http://localhost:3000/api/offers/Msdbj0
+content-type: application/json
+
+{
+    "picture": "test 2",
+    "title": "Продам гараж",
+    "description": "Пользовались 2-3 раза",
+    "category": [
+      "Авто"
+    ],
+    "sum": 1001,
+    "type": "OFFER"
+}
