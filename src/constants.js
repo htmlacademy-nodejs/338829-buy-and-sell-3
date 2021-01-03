@@ -10,8 +10,13 @@ const FILE_MOCK_PATH = `mocks.json`;
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
 const FILE_TITLES_PATH = `./data/titles.txt`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
+const FILE_COMMENTS_PATH = `./data/comments.txt`;
 
 const MAX_MOCK_ITEMS = 1000;
+const MAX_ID_LENGTH = 6;
+const MAX_COMMENTS = 5;
+
+const API_PREFIX = `/api`;
 
 const OfferType = {
   OFFER: `offer`,
@@ -33,6 +38,11 @@ const SentencesRestrict = {
   MAX: 5,
 };
 
+const CommentsRestrict = {
+  MIN: 1,
+  MAX: 3,
+};
+
 const CliCommand = {
   HELP: `--help`,
   VERSION: `--version`,
@@ -46,10 +56,12 @@ const ExitCode = {
 
 const HttpCode = {
   OK: 200,
-  NOT_FOUND: 404,
-  INTERNAL_SERVER_ERROR: 500,
-  FORBIDDEN: 403,
+  CREATED: 201,
+  BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  INTERNAL_SERVER_ERROR: 500
 };
 
 const DEFAULT_CLI_COMMAND = CliCommand.HELP;
@@ -65,11 +77,16 @@ module.exports = {
   FILE_SENTENCES_PATH,
   FILE_TITLES_PATH,
   FILE_CATEGORIES_PATH,
+  FILE_COMMENTS_PATH,
   MAX_MOCK_ITEMS,
+  MAX_ID_LENGTH,
+  MAX_COMMENTS,
+  API_PREFIX,
   OfferType,
   SumRestrict,
   PictureRestrict,
   SentencesRestrict,
+  CommentsRestrict,
   CliCommand,
   ExitCode,
   HttpCode
