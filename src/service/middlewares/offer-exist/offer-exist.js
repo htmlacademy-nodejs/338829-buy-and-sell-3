@@ -1,6 +1,6 @@
 'use strict';
 
-const {HttpCode} = require(`../../constants`);
+const {HttpCode} = require(`../../../constants`);
 
 module.exports = (offerService) => (req, res, next) => {
   const {offerId} = req.params;
