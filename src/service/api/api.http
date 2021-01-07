@@ -6,7 +6,7 @@ GET http://localhost:3000/api/offers/1
 ###
 DELETE http://localhost:3000/api/offers/rFVOIO
 ###
-GET http://localhost:3000/api/offers/Msdbj0
+GET http://localhost:3000/api/offers/rFVOIO
 ###
 POST http://localhost:3000/api/offers
 content-type: application/json
@@ -42,3 +42,15 @@ content-type: application/json
     "sum": 1001,
     "type": "OFFER"
 }
+###
+GET http://localhost:3000/api/offers/3DD_SH/comments
+###
+DELETE http://localhost:3000/api/offers/3DD_SH/comments/k7dHQQ
+###
+POST http://localhost:3000/api/offers/3DD_SH/comments
+content-type: application/json
+
+{
+    "text": "test comment 123231 "
+}
+###
