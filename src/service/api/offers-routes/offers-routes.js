@@ -74,8 +74,6 @@ module.exports = (app, offersService, commentsService) => {
 
     commentsService.delete(offer, commentId);
     offersService.update(offerId, offer);
-
-    console.log(offer);
     return res
       .status(HttpCode.NO_CONTENT)
       .send(``);
