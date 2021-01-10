@@ -9,7 +9,7 @@ module.exports = (offerService) => (req, res, next) => {
   if (!offer) {
     return res
         .status(HttpCode.NOT_FOUND)
-        .send(`Offer with ${offerId} not found `);
+        .send(`Offer with ${offerId} not found`);
   }
 
   res.locals.offer = offer;

@@ -43,7 +43,7 @@ const app = express();
 app.use(express.json());
 searchRoutes(app, new SearchService(mockData));
 
-describe(`API должно возвращать список предложений на основе данных поиска query`, () => {
+describe(`API returns offer based on search query`, () => {
   let response;
 
   beforeAll(async () => {
@@ -58,16 +58,16 @@ describe(`API должно возвращать список предложен�
     expect(response.statusCode).toBe(HttpCode.OK);
   });
 
-  test(`Должно вернуть 1 предложение`, () => {
+  test(`1 offer found`, () => {
     expect(response.body.length).toBe(1);
   });
 
-  test(`id должно быть A97rIR`, () => {
+  test(`Offer has correct id`, () => {
     expect(response.body[0].id).toBe(`A97rIR`);
   });
 });
 
-describe(`API должно возвращать 404 код при отсутствии найденных совпадений`, () => {
+describe(`API returns code 404 if nothing is found`, () => {
   let response;
 
   beforeAll(async () => {
@@ -82,12 +82,12 @@ describe(`API должно возвращать 404 код при отсутст
     expect(response.statusCode).toBe(HttpCode.NOT_FOUND);
   });
 
-  test(`Ответ должен быть Not found`, () => {
+  test(`Response text to equal "Not found"`, () => {
     expect(response.text).toBe(`Not found`);
   });
 });
 
-describe(`API должно возвращать 400 код при некорректном запросе`, () => {
+describe(`API returns code 400 when query string is absent`, () => {
   let response;
 
   beforeAll(async () => {

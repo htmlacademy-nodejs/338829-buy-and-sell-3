@@ -9,9 +9,8 @@ const {
   offerExist
 } = require(`../../middlewares`);
 
-const route = new Router();
-
 module.exports = (app, offersService, commentsService) => {
+  const route = new Router();
   app.use(`/offers`, route);
 
   route.get(`/`, (req, res) => {
@@ -35,7 +34,7 @@ module.exports = (app, offersService, commentsService) => {
       .json(offer);
   });
 
-  route.put(`/:offerId`, offerExist(offersService), (req, res) => {
+  route.put(`/:offerId`, [offerExist(offersService), offerValidator], (req, res) => {
     const {offerId} = req.params;
     offersService.update(offerId, req.body);
     return res

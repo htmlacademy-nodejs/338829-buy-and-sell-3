@@ -44,7 +44,7 @@ const app = express();
 app.use(express.json());
 categoryRoutes(app, new CategoryService(mockData));
 
-describe(`API должно возвращать список категорий`, () => {
+describe(`API returns category list`, () => {
   let response;
 
   beforeAll(async () => {
@@ -55,7 +55,7 @@ describe(`API должно возвращать список категорий`
     expect(response.statusCode).toBe(HttpCode.OK);
   });
 
-  test(`Должен вернуться массив уникальных категорий`, () => {
+  test(`Return Array of category name are "Журналы", "Игры", "Животные"`, () => {
     expect(response.body).toEqual([
       `Животные`,
       `Детские товары`,
