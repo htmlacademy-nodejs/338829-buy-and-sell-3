@@ -8,7 +8,7 @@ module.exports = (validKeys) => (req, res, next) => {
   const keysExists = validKeys.every((key) => keys.includes(key));
 
   if (!keysExists) {
-    return res
+    res
       .status(HttpCode.BAD_REQUEST)
       .send(`Bad request`);
   }
