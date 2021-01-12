@@ -3,6 +3,7 @@
 const express = require(`express`);
 const routes = require(`../api`);
 const {getLogger} = require(`../lib/logger`);
+const {requestLogger} = require(`../middlewares`);
 
 const {
   DEFAULT_PORT,
@@ -20,15 +21,8 @@ const startHttpServer = (port) => {
   try {
     const app = express();
     app.use(express.json());
+    app.use(requestLogger(logger));
     app.use(API_PREFIX, routes);
-
-    app.use((req, res, next) => {
-      logger.debug(`Request on route ${req.url}`);
-      res.on(`finish`, () => {
-        logger.info(`Response status code ${res.statusCode}`);
-      });
-      next();
-    });
 
     app.use((req, res) => {
       logger.error(`Route not found: ${req.url}`);

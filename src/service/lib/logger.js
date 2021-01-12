@@ -12,8 +12,7 @@ const isDevMode = process.env.NODE_ENV === NodeEnv.DEVELOPMENT;
 const logger = pino(
     {
       name: `base-logger`,
-      level: process.env.LOG_LEVEL || LogLevel.INFO,
-      prettyPrint: isDevMode
+      level: process.env.LOG_LEVEL || LogLevel.INFO
     },
     isDevMode ? process.stdout : pino.destination(FILE_API_LOG_PATH)
 );

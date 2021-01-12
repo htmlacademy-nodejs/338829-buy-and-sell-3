@@ -3,10 +3,12 @@
 const validator = require(`./validator/validator`);
 const offerExist = require(`./offer-exist/offer-exist`);
 const commentExist = require(`./comment-exist/comment-exist`);
+const requestLogger = require(`./request-logger/request-logger`);
 
 module.exports = {
   offerValidator: validator([`picture`, `title`, `description`, `category`, `sum`, `type`]),
   commentValidator: validator([`text`]),
   offerExist,
-  commentExist
+  commentExist,
+  requestLogger
 };
