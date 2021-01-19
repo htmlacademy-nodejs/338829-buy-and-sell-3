@@ -53,11 +53,12 @@ const createApp = () => {
 };
 
 describe(`READ: API offers`, () => {
-  const app = createApp();
+  let app;
   let response;
 
   describe(`correctly`, () => {
     beforeAll(async () => {
+      app = createApp();
       response = await request(app).get(`/offers`);
     });
 
@@ -76,8 +77,12 @@ describe(`READ: API offers`, () => {
 });
 
 describe(`READ: API offer`, () => {
-  const app = createApp();
+  let app;
   let response;
+
+  beforeAll(() => {
+    app = createApp();
+  });
 
   describe(`Correctly: with given id`, () => {
     beforeAll(async () => {
@@ -113,17 +118,21 @@ describe(`READ: API offer`, () => {
 });
 
 describe(`CREATE: API offer`, () => {
-  const app = createApp();
+  let app;
   let response;
+  let newOffer;
 
-  const newOffer = {
-    "title": `Продам гараж`,
-    "picture": `item02.jpg`,
-    "description": `Никаких нареканий или недостатков.`,
-    "type": `OFFER`,
-    "sum": 100,
-    "category": [`Разное`]
-  };
+  beforeAll(() => {
+    app = createApp();
+    newOffer = {
+      "title": `Продам гараж`,
+      "picture": `item02.jpg`,
+      "description": `Никаких нареканий или недостатков.`,
+      "type": `OFFER`,
+      "sum": 100,
+      "category": [`Разное`]
+    };
+  });
 
   describe(`Correctly`, () => {
     beforeAll(async () => {
@@ -164,17 +173,21 @@ describe(`CREATE: API offer`, () => {
 });
 
 describe(`UPDATE: API offer`, () => {
-  const app = createApp();
+  let app;
   let response;
+  let updateOffer;
 
-  const updateOffer = {
-    "title": `Продам НОВЫЙ гараж`,
-    "picture": `item02.jpg`,
-    "description": `Без дверей`,
-    "type": `OFFER`,
-    "sum": 101,
-    "category": [`Гараж`]
-  };
+  beforeAll(() => {
+    app = createApp();
+    updateOffer = {
+      "title": `Продам НОВЫЙ гараж`,
+      "picture": `item02.jpg`,
+      "description": `Без дверей`,
+      "type": `OFFER`,
+      "sum": 101,
+      "category": [`Гараж`]
+    };
+  });
 
   describe(`Correctly`, () => {
     beforeAll(async () => {
@@ -216,12 +229,16 @@ describe(`UPDATE: API offer`, () => {
 });
 
 describe(`DELETE: API offer`, () => {
-  const app = createApp();
-  const offerId = `_o8u33`;
+  let app;
   let response;
+
+  beforeAll(() => {
+    app = createApp();
+  });
 
   describe(`Correctly`, () => {
     beforeAll(async () => {
+      const offerId = `_o8u33`;
       response = await request(app).delete(`/offers/${offerId}`);
     });
 
@@ -244,12 +261,16 @@ describe(`DELETE: API offer`, () => {
 });
 
 describe(`READ: API comments`, () => {
-  const app = createApp();
-  const offerId = `_o8u33`;
+  let app;
   let response;
+
+  beforeAll(() => {
+    app = createApp();
+  });
 
   describe(`Correctly`, () => {
     beforeAll(async () => {
+      const offerId = `_o8u33`;
       response = await request(app).get(`/offers/${offerId}/comments`);
     });
 
@@ -278,13 +299,18 @@ describe(`READ: API comments`, () => {
 });
 
 describe(`CREATE: API comments`, () => {
-  const app = createApp();
-  const offerId = `_o8u33`;
-  const newComment = {
-    text: `Оплата наличными или перевод на карту?`
-  };
-
+  let app;
+  let offerId;
+  let newComment;
   let response;
+
+  beforeAll(() => {
+    app = createApp();
+    newComment = {
+      text: `Оплата наличными или перевод на карту?`
+    };
+    offerId = `_o8u33`;
+  });
 
   describe(`Correctly`, () => {
     beforeAll(async () => {
@@ -329,11 +355,16 @@ describe(`CREATE: API comments`, () => {
 });
 
 describe(`DELETE: API comments`, () => {
-  const app = createApp();
-  const offerId = `_o8u33`;
-  const commentId = `6roIro`;
-
+  let app;
+  let offerId;
+  let commentId;
   let response;
+
+  beforeAll(() => {
+    app = createApp();
+    commentId = `6roIro`;
+    offerId = `_o8u33`;
+  });
 
   describe(`Correctly`, () => {
     beforeAll(async () => {
