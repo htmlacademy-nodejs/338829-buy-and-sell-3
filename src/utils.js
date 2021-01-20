@@ -20,8 +20,21 @@ const checkNumParam = (value, defaultValue) => {
   return valueNum && valueNum > 0 ? valueNum : defaultValue;
 };
 
+const getCategoryOffer = (body) => {
+  if (Array.isArray(body.category)) {
+    return body.category;
+  }
+
+  if (typeof body.category === `string`) {
+    return [body.category];
+  }
+
+  return [];
+};
+
 module.exports = {
   getRandomInt,
   shuffle,
-  checkNumParam
+  checkNumParam,
+  getCategoryOffer
 };

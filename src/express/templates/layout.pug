@@ -1,3 +1,10 @@
+mixin ticketLabel(type)
+  span(class!=attributes.class || `ticket-card__label`) #{type === `OFFER` ? `Куплю` : `Продам`}
+
+mixin ticketPicture(picture = `blank.png`, title)
+  // img(src='/img/' + picture srcset='/img/item02@2x.jpg 2x' alt=title)
+  img(src='/img/' + picture alt=title)
+
 doctype html
 html(lang="ru")
   head
@@ -11,5 +18,5 @@ html(lang="ru")
     include partials/header
     block content
     include partials/footer
-    script(src='js/vendor.js')
-    script(src='js/main.js')
+    script(src='/js/vendor.js')
+    script(src='/js/main.js')

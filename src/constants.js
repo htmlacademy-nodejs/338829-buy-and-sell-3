@@ -5,6 +5,7 @@ const DEFAULT_GENERATE_COUNT = 1;
 const DEFAULT_PORT = 3000;
 const DEFAULT_EXPRESS_PORT = 8080;
 const EXPRESS_PUBLIC_DIR = `public`;
+const EXPRESS_UPLOAD_DIR = `upload`;
 
 const FILE_MOCK_PATH = `mocks.json`;
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
@@ -18,6 +19,7 @@ const MAX_ID_LENGTH = 6;
 const MAX_COMMENTS = 5;
 
 const API_PREFIX = `/api`;
+const API_TIMEOUT = 1000;
 
 const OfferType = {
   OFFER: `offer`,
@@ -86,6 +88,7 @@ module.exports = {
   DEFAULT_PORT,
   DEFAULT_EXPRESS_PORT,
   EXPRESS_PUBLIC_DIR,
+  EXPRESS_UPLOAD_DIR,
   FILE_MOCK_PATH,
   FILE_SENTENCES_PATH,
   FILE_TITLES_PATH,
@@ -95,6 +98,7 @@ module.exports = {
   MAX_ID_LENGTH,
   MAX_COMMENTS,
   API_PREFIX,
+  API_TIMEOUT,
   FILE_API_LOG_PATH,
   OfferType,
   SumRestrict,
