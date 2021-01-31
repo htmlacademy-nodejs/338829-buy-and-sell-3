@@ -32,9 +32,14 @@ const getCategoryOffer = (body) => {
   return [];
 };
 
+const getPictureFileName = (number) => {
+  return number < 10 ? `item0${number}.jpg` : `item${number}.jpg`;
+};
+
 module.exports = {
   getRandomInt,
   shuffle,
   checkNumParam,
-  getCategoryOffer
+  getCategoryOffer,
+  getPictureFileName
 };

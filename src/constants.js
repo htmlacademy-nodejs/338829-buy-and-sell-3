@@ -8,6 +8,7 @@ const EXPRESS_PUBLIC_DIR = `public`;
 const EXPRESS_UPLOAD_DIR = `upload`;
 
 const FILE_MOCK_PATH = `mocks.json`;
+const FILE_SQL_PATH = `fill-db.sql`;
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
 const FILE_TITLES_PATH = `./data/titles.txt`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
@@ -17,6 +18,7 @@ const FILE_API_LOG_PATH = `./src/service/logs/api.log`;
 const MAX_MOCK_ITEMS = 1000;
 const MAX_ID_LENGTH = 6;
 const MAX_COMMENTS = 5;
+const MAX_CATEGORIES = 4;
 
 const API_PREFIX = `/api`;
 const API_TIMEOUT = 1000;
@@ -50,7 +52,8 @@ const CliCommand = {
   HELP: `--help`,
   VERSION: `--version`,
   GENERATE: `--generate`,
-  SERVER: `--server`
+  SERVER: `--server`,
+  FILL: `--fill`
 };
 
 const ExitCode = {
@@ -90,6 +93,7 @@ module.exports = {
   EXPRESS_PUBLIC_DIR,
   EXPRESS_UPLOAD_DIR,
   FILE_MOCK_PATH,
+  FILE_SQL_PATH,
   FILE_SENTENCES_PATH,
   FILE_TITLES_PATH,
   FILE_CATEGORIES_PATH,
@@ -97,6 +101,7 @@ module.exports = {
   MAX_MOCK_ITEMS,
   MAX_ID_LENGTH,
   MAX_COMMENTS,
+  MAX_CATEGORIES,
   API_PREFIX,
   API_TIMEOUT,
   FILE_API_LOG_PATH,
