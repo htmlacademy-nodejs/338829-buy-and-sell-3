@@ -20,7 +20,7 @@ FROM categories
 
 -- select last offers
 SELECT offers.*,
-  COUNT(comments.id) as comments_count,
+  COUNT(DISTINCT comments.id) as comments_count,
   STRING_AGG(DISTINCT categories.name, ', ') AS category_list,
   users.first_name,
   users.last_name,
@@ -35,7 +35,7 @@ FROM offers
 
 -- select offer id = 1
 SELECT offers.*,
-  COUNT(comments.id) AS comments_count,
+  COUNT(DISTINCT comments.id) AS comments_count,
   STRING_AGG(DISTINCT categories.name, ', ') AS category_list,
   users.first_name,
   users.last_name,
