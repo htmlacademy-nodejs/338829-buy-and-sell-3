@@ -10,13 +10,13 @@ FROM categories
 
 -- all categories with offer count
 SELECT
-  id,
-  name,
-  COUNT(offer_id)
+  categories.id,
+  categories.name,
+  COUNT(DISTINCT offer_categories.offer_id)
 FROM categories
   LEFT JOIN offer_categories
-  ON id = category_id
-  GROUP BY id;
+  ON categories.id = offer_categories.category_id
+  GROUP BY categories.id;
 
 -- select last offers
 SELECT offers.*,
