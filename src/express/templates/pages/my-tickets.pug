@@ -18,10 +18,10 @@ block content
                   +ticketLabel(item.type)
                   .ticket-card__categories
                     each category in item.categories
-                      a(href='#') #{category.name}
+                      a(href='/offers/category/' + category.id) #{category.name}
                   .ticket-card__header
                     h3.ticket-card__title
-                      a(href='#') #{item.title}
+                      a(href='/offers/' + item.id) #{item.title}
                     p.ticket-card__price
                       span.js-sum #{item.sum}
                       |  ₽

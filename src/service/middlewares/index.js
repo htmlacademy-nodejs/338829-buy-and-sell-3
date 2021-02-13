@@ -6,7 +6,7 @@ const commentExist = require(`./comment-exist/comment-exist`);
 const requestLogger = require(`./request-logger/request-logger`);
 
 module.exports = {
-  offerValidator: validator([`picture`, `title`, `description`, `category`, `sum`, `type`]),
+  offerValidator: validator([`picture`, `title`, `description`, `categories`, `sum`, `type`]),
   commentValidator: validator([`text`]),
   offerExist,
   commentExist,

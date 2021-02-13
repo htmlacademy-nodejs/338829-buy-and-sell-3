@@ -8,15 +8,24 @@ const {getCategoryOffer} = require(`../../utils`);
 
 const offersRouter = new Router();
 
-offersRouter.get(`/category/:id`, (req, res) => res.render(`pages/category`));
+offersRouter.get(`/category/:id`, async (req, res) => {
+  const hasCount = true;
+
+  const [offers, categories] = await Promise.all([
+    axiosApi.getOffers(),
+    axiosApi.getCategories(hasCount)
+  ]);
+
+  res.render(`pages/category`, {tickets: offers, categories});
+});
 
 offersRouter.get(`/add`, async (req, res) => {
   const categories = await axiosApi.getCategories();
   res.render(`pages/new-ticket`, {
     categories,
     newOffer: {
-      category: [],
-      picture: ``
+      categories: [],
+      picture: `blank.png`
     }
   });
 });
@@ -25,12 +34,12 @@ offersRouter.post(`/add`, pictureUpload.single(`avatar`), async (req, res) => {
   const {body, file} = req;
 
   const newOffer = {
-    picture: file && file.filename,
-    sum: body.price,
-    type: body.action,
-    description: body.comment,
-    title: body[`ticket-name`],
-    category: getCategoryOffer(body)
+    title: body.title,
+    description: body.description,
+    picture: file && file.filename || `blank.png`,
+    sum: body.sum,
+    type: body.type,
+    categories: getCategoryOffer(body.categories)
   };
 
   try {
@@ -38,7 +47,10 @@ offersRouter.post(`/add`, pictureUpload.single(`avatar`), async (req, res) => {
     res.redirect(`/my`);
   } catch (e) {
     const categories = await axiosApi.getCategories();
-    res.render(`pages/new-ticket`, {categories, newOffer});
+    res.render(`pages/new-ticket`, {
+      categories,
+      newOffer
+    });
   }
 });
 
@@ -50,15 +62,27 @@ offersRouter.get(`/edit/:id`, async (req, res) => {
       axiosApi.getOffer(id)
     ]);
 
-    res
-      .render(`pages/ticket-edit`, {ticket: offer, categories});
+    res.render(`pages/ticket-edit`, {ticket: offer, categories});
   } catch (error) {
+    console.log(error);
     res
       .status(HttpCode.NOT_FOUND)
       .render(`errors/404`);
   }
 });
 
-offersRouter.get(`/:id`, (req, res) => res.render(`pages/ticket`));
+offersRouter.get(`/:id`, async (req, res) => {
+  try {
+    const {id} = req.params;
+    const hasComments = true;
+    const offer = await axiosApi.getOffer(id, hasComments);
+
+    res.render(`pages/ticket`, {ticket: offer});
+  } catch (error) {
+    res
+      .status(HttpCode.NOT_FOUND)
+      .render(`errors/404`);
+  }
+});
 
 module.exports = offersRouter;

@@ -23,13 +23,13 @@ const checkNumParam = (value, defaultValue) => {
   return valueNum && valueNum > 0 ? valueNum : defaultValue;
 };
 
-const getCategoryOffer = (body) => {
-  if (Array.isArray(body.category)) {
-    return body.category;
+const getCategoryOffer = (categories) => {
+  if (Array.isArray(categories)) {
+    return categories.map((id) => Number(id));
   }
 
-  if (typeof body.category === `string`) {
-    return [body.category];
+  if (typeof categories === `string`) {
+    return [Number(categories)];
   }
 
   return [];

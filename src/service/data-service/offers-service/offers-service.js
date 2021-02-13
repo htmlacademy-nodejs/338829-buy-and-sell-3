@@ -36,8 +36,8 @@ class OffersService {
     return offers.map((item) => item.get());
   }
 
-  findOne(id) {
-    return this._Offer.findByPk(id, {include: [Aliase.CATEGORIES]});
+  findOne(id, hasComments) {
+    return this._Offer.findByPk(id, {include: hasComments ? [Aliase.CATEGORIES, Aliase.COMMENTS] : [Aliase.CATEGORIES]});
   }
 }
 

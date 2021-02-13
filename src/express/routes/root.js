@@ -5,10 +5,15 @@ const {Router} = require(`express`);
 const rootRouter = new Router();
 
 rootRouter.get(`/`, async (req, res) => {
-  const offers = await axiosApi.getOffers();
+  const hasCount = true;
+
+  const [offers, categories] = await Promise.all([
+    axiosApi.getOffers(),
+    axiosApi.getCategories(hasCount)
+  ]);
 
   if (offers.length > 0) {
-    res.render(`pages/main`, {tickets: offers});
+    res.render(`pages/main`, {tickets: offers, categories});
   } else {
     res.render(`pages/main-empty`);
   }

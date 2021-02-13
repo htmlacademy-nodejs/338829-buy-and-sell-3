@@ -18,7 +18,6 @@ class SearchService {
       include: [Aliase.CATEGORIES],
     });
 
-    console.log(offers);
     return offers.map((offer) => offer.get());
   }
 }
