@@ -2,37 +2,44 @@
 
 const express = require(`express`);
 const request = require(`supertest`);
+const Sequelize = require(`sequelize`);
 
+const initDB = require(`../../lib/init-db`);
 const searchRoutes = require(`./search-routes`);
 const {SearchService} = require(`../../data-service`);
 
-const mockData = [
+const mockCategories = [
+  `Животные`,
+  `Журналы`,
+  `Игры`
+];
+
+const mockOffers = [
   {
-    "id": `3DD_SH`,
-    "title": `Продам советскую посуду. Почти не разбита.`,
-    "picture": `item13.jpg`,
-    "description": `Любые проверки на месте. Пользовались 2-3 раза, по состоянию видно. Кузов без намёка на ржавчину. Товар в отличном состоянии.`,
-    "type": `OFFER`,
-    "sum": 98169,
-    "category": [`Одежда`, `Журналы`],
+    "title": `Продам камаз или обменяю на Citroen.`,
+    "picture": `item11.jpg`,
+    "description": `Кажется что это хрупкая вещь. Имеется коробка и все документы. Если есть какие-то вопросы - пишите, на все отвечу :) Если товар не понравится — верну всё до последней копейки.`,
+    "type": `SALE`,
+    "sum": 22806,
+    "categories": [`Животные`],
     "comments": [
-      {"id": `k7dHQQ`, "text": `Оплата наличными или перевод на карту? Продаю в связи с переездом. Отрываю от сердца. Почему в таком ужасном состоянии?`},
-      {"id": `dklv6M`, "text": `С чем связана продажа? Почему так дешёво? Почему в таком ужасном состоянии? Вы что?! В магазине дешевле.`}
+      {"text": `Оплата наличными или перевод на карту? Вы что?! В магазине дешевле.`},
+      {"text": `Почему в таком ужасном состоянии?`},
+      {"text": `Неплохо, но дорого. Продаю в связи с переездом. Отрываю от сердца. А сколько игр в комплекте?`},
+      {"text": `С чем связана продажа? Почему так дешёво?`}
     ]
   },
   {
-    "id": `A97rIR`,
-    "title": `Собака в добрые руки.`,
-    "picture": `item12.jpg`,
-    "description": `Товар в отличном состоянии. Кузов без намёка на ржавчину. Пользовались бережно и только по большим праздникам. Старые или очень старые, бу или сильно бу...`,
+    "title": `Джинсовые сумки.`,
+    "picture": `item07.jpg`,
+    "description": `Никаких нареканий или недостатков. Все детали в рабочем состоянии. Кажется что это хрупкая вещь. Две страницы заляпаны свежим кофе.`,
     "type": `OFFER`,
-    "sum": 90867,
-    "category": [`Журналы`, `Разное`, `Бытовая техника`],
+    "sum": 30699,
+    "categories": [`Журналы`, `Игры`],
     "comments": [
-      {"id": `c-2YEh`, "text": `Почему в таком ужасном состоянии? Неплохо, но дорого. С чем связана продажа? Почему так дешёво?`},
-      {"id": `ErDTEN`, "text": `Вы что?! В магазине дешевле. Совсем немного... Почему в таком ужасном состоянии?`},
-      {"id": `zciBrC`, "text": `Продаю в связи с переездом. Отрываю от сердца. Неплохо, но дорого.`},
-      {"id": `cqkdCj`, "text": `Оплата наличными или перевод на карту? С чем связана продажа? Почему так дешёво?`}
+      {"text": `А где блок питания? Неплохо, но дорого. Вы что?! В магазине дешевле.`},
+      {"text": `Оплата наличными или перевод на карту?`},
+      {"text": `А где блок питания? С чем связана продажа? Почему так дешёво? Продаю в связи с переездом. Отрываю от сердца.`}
     ]
   }
 ];
@@ -41,16 +48,20 @@ const {HttpCode} = require(`../../../constants`);
 
 const app = express();
 app.use(express.json());
-searchRoutes(app, new SearchService(mockData));
+
+const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
 
 describe(`API returns offer based on search query`, () => {
   let response;
 
   beforeAll(async () => {
+    await initDB(mockDB, {categories: mockCategories, offers: mockOffers});
+    searchRoutes(app, new SearchService(mockDB));
+
     response = await request(app)
       .get(`/search`)
       .query({
-        query: `собака`
+        query: `Citroen`
       });
   });
 
@@ -62,8 +73,8 @@ describe(`API returns offer based on search query`, () => {
     expect(response.body.length).toBe(1);
   });
 
-  test(`Offer has correct id`, () => {
-    expect(response.body[0].id).toBe(`A97rIR`);
+  test(`Offer has correct title`, () => {
+    expect(response.body[0].title).toBe(`Продам камаз или обменяю на Citroen.`);
   });
 });
 

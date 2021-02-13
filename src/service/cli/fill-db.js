@@ -3,8 +3,7 @@
 const chalk = require(`chalk`);
 const {getLogger} = require(`../lib/logger`);
 const sequelize = require(`../lib/sequelize`);
-const defineModels = require(`../models`);
-const Aliase = require(`../models/aliase`);
+const initDB = require(`../lib/init-db`);
 
 const {
   CliCommand,
@@ -78,7 +77,6 @@ module.exports = {
       return;
     }
 
-    const {Category, Offer} = defineModels(sequelize);
     await sequelize.sync({force: true});
 
     const [categories, sentences, titles, comments] = await Promise.all([
@@ -96,14 +94,6 @@ module.exports = {
       comments
     });
 
-    await Category.bulkCreate(categories.map((item) => ({name: item})));
-
-    const offerPromises = offers.map(async (offer) => {
-      const offerModel = await Offer.create(offer, {include: [Aliase.COMMENTS]});
-      const categoryIds = offer.categories.map((_it, i) => i + 1);
-      await offerModel.addCategories(categoryIds);
-    });
-
-    await Promise.all(offerPromises);
+    await initDB(sequelize, {categories, offers});
   }
 };

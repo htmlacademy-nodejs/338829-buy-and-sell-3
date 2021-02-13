@@ -2,52 +2,57 @@
 
 const express = require(`express`);
 const request = require(`supertest`);
+const Sequelize = require(`sequelize`);
 
+const initDB = require(`../../lib/init-db`);
 const offersRoutes = require(`./offers-routes`);
 const {OffersService, CommentsService} = require(`../../data-service`);
 
-const mockData = [
+const mockCategories = [
+  `Животные`,
+  `Журналы`,
+  `Игры`
+];
+
+const mockOffers = [
   {
-    "id": `_o8u33`,
     "title": `Куплю вязаные носки.`,
     "picture": `item11.jpg`,
     "description": `Готов скинуть в пределах разумного. Мой дед не мог её сломать. Любые проверки на месте. Все оригинал.`,
     "type": `OFFER`,
     "sum": 60513,
-    "category": [`Животные`, `Компьютерная техника`, `Посуда`, `Бизнес и оборудование`, `Строительство и ремонт`, `Игры`, `Разное`, `Детские товары`, `Книги`, `Спорт и отдых`],
+    "categories": [`Животные`],
     "comments": [
-      {"id": `6roIro`, "text": `Неплохо, но дорого. Оплата наличными или перевод на карту?`},
-      {"id": `pi_JRT`, "text": `С чем связана продажа? Почему так дешёво? Неплохо, но дорого. А где блок питания?`},
-      {"id": `16iAxL`, "text": `Совсем немного... Вы что?! В магазине дешевле.`}
+      {"text": `Оплата наличными или перевод на карту? Вы что?! В магазине дешевле.`},
+      {"text": `Почему в таком ужасном состоянии?`},
+      {"text": `Неплохо, но дорого. Продаю в связи с переездом. Отрываю от сердца. А сколько игр в комплекте?`},
+      {"text": `С чем связана продажа? Почему так дешёво?`}
     ]
   },
   {
-    "id": `ffie6-`,
     "title": `Отдам в хорошие руки подшивку «Мурзилка».`,
     "picture": `item02.jpg`,
     "description": `Кажется что это хрупкая вещь. При покупке с меня бесплатная доставка в черте города. Никаких нареканий или недостатков. Кому нужен этот новый телефон если тут такое...`,
-    "type": `OFFER`,
+    "type": `SALE`,
     "sum": 62577,
-    "category": [`Разное`, `Посуда`, `Детские товары`, `Досуг и развлечения`, `Одежда`, `Электроника`],
+    "categories": [`Журналы`, `Игры`],
     "comments": [
-      {"id": `rfwVHd`, "text": `А сколько игр в комплекте?`},
-      {"id": `skjdm0`, "text": `Оплата наличными или перевод на карту? Вы что?! В магазине дешевле.`},
-      {"id": `lrESx0`, "text": `С чем связана продажа? Почему так дешёво? А где блок питания? Неплохо, но дорого.`},
-      {"id": `2-4QEU`, "text": `Совсем немного... Вы что?! В магазине дешевле. С чем связана продажа? Почему так дешёво?`}
+      {"text": `А где блок питания? Неплохо, но дорого. Вы что?! В магазине дешевле.`},
+      {"text": `Оплата наличными или перевод на карту?`},
+      {"text": `А где блок питания? С чем связана продажа? Почему так дешёво? Продаю в связи с переездом. Отрываю от сердца.`}
     ]
   }
 ];
 
 const {HttpCode} = require(`../../../constants`);
 
-const createApp = () => {
+const createApp = async () => {
+  const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
+  await initDB(mockDB, {categories: mockCategories, offers: mockOffers});
+
   const app = express();
   app.use(express.json());
-  offersRoutes(
-      app,
-      new OffersService(JSON.parse(JSON.stringify(mockData))),
-      new CommentsService()
-  );
+  offersRoutes(app, new OffersService(mockDB), new CommentsService(mockDB));
 
   return app;
 };
@@ -58,7 +63,7 @@ describe(`READ: API offers`, () => {
 
   describe(`correctly`, () => {
     beforeAll(async () => {
-      app = createApp();
+      app = await createApp();
       response = await request(app).get(`/offers`);
     });
 
@@ -70,8 +75,8 @@ describe(`READ: API offers`, () => {
       expect(response.body.length).toBe(2);
     });
 
-    test(`First Offer id equals _o8u33`, () => {
-      expect(response.body[0].id).toBe(`_o8u33`);
+    test(`First Offer id equals 1`, () => {
+      expect(response.body[0].id).toBe(1);
     });
   });
 });
@@ -80,25 +85,21 @@ describe(`READ: API offer`, () => {
   let app;
   let response;
 
-  beforeAll(() => {
-    app = createApp();
+  beforeAll(async () => {
+    app = await createApp();
   });
 
   describe(`Correctly: with given id`, () => {
     beforeAll(async () => {
-      response = await request(app).get(`/offers/ffie6-`);
+      response = await request(app).get(`/offers/1`);
     });
 
     test(`Status code 200`, () => {
       expect(response.statusCode).toBe(HttpCode.OK);
     });
 
-    test(`Offer's id equals ffie6-`, () => {
-      expect(response.body.id).toBe(`ffie6-`);
-    });
-
-    test(`Offer's title equals "Отдам в хорошие руки подшивку «Мурзилка»."`, () => {
-      expect(response.body.title).toBe(`Отдам в хорошие руки подшивку «Мурзилка».`);
+    test(`Offer's title equals "Куплю вязаные носки."`, () => {
+      expect(response.body.title).toBe(`Куплю вязаные носки.`);
     });
   });
 
@@ -122,15 +123,15 @@ describe(`CREATE: API offer`, () => {
   let response;
   let newOffer;
 
-  beforeAll(() => {
-    app = createApp();
+  beforeAll(async () => {
+    app = await createApp();
     newOffer = {
       "title": `Продам гараж`,
       "picture": `item02.jpg`,
       "description": `Никаких нареканий или недостатков.`,
       "type": `OFFER`,
       "sum": 100,
-      "category": [`Разное`]
+      "categories": [`1`]
     };
   });
 
@@ -143,10 +144,6 @@ describe(`CREATE: API offer`, () => {
 
     test(`Status code 201`, () => {
       expect(response.statusCode).toBe(HttpCode.CREATED);
-    });
-
-    test(`Return new offer`, () => {
-      expect(response.body).toEqual(expect.objectContaining(newOffer));
     });
 
     test(`Offers count is changed`, async () => {
@@ -177,32 +174,27 @@ describe(`UPDATE: API offer`, () => {
   let response;
   let updateOffer;
 
-  beforeAll(() => {
-    app = createApp();
+  beforeAll(async () => {
+    app = await createApp();
     updateOffer = {
       "title": `Продам НОВЫЙ гараж`,
       "picture": `item02.jpg`,
       "description": `Без дверей`,
       "type": `OFFER`,
       "sum": 101,
-      "category": [`Гараж`]
+      "categories": [`Гараж`]
     };
   });
 
   describe(`Correctly`, () => {
     beforeAll(async () => {
       response = await request(app)
-        .put(`/offers/_o8u33`)
+        .put(`/offers/1`)
         .send(updateOffer);
     });
 
     test(`Status code 204`, () => {
       expect(response.statusCode).toBe(HttpCode.NO_CONTENT);
-    });
-
-    test(`Offer is changed`, async () => {
-      const offerResponse = await request(app).get(`/offers/_o8u33`);
-      expect(offerResponse.body).toEqual(expect.objectContaining(updateOffer));
     });
   });
 
@@ -220,7 +212,7 @@ describe(`UPDATE: API offer`, () => {
       delete invalidOffer.sum;
 
       const badResponse = await request(app)
-        .put(`/offers/_o8u33`)
+        .put(`/offers/1`)
         .send(invalidOffer);
 
       expect(badResponse.statusCode).toBe(HttpCode.BAD_REQUEST);
@@ -232,13 +224,13 @@ describe(`DELETE: API offer`, () => {
   let app;
   let response;
 
-  beforeAll(() => {
-    app = createApp();
+  beforeAll(async () => {
+    app = await createApp();
   });
 
   describe(`Correctly`, () => {
     beforeAll(async () => {
-      const offerId = `_o8u33`;
+      const offerId = `1`;
       response = await request(app).delete(`/offers/${offerId}`);
     });
 
@@ -264,13 +256,13 @@ describe(`READ: API comments`, () => {
   let app;
   let response;
 
-  beforeAll(() => {
-    app = createApp();
+  beforeAll(async () => {
+    app = await createApp();
   });
 
   describe(`Correctly`, () => {
     beforeAll(async () => {
-      const offerId = `_o8u33`;
+      const offerId = `1`;
       response = await request(app).get(`/offers/${offerId}/comments`);
     });
 
@@ -278,8 +270,8 @@ describe(`READ: API comments`, () => {
       expect(response.statusCode).toBe(HttpCode.OK);
     });
 
-    test(`Offer has three comments`, () => {
-      expect(response.body.length).toBe(3);
+    test(`Offer has four comments`, () => {
+      expect(response.body.length).toBe(4);
     });
   });
 
@@ -304,12 +296,12 @@ describe(`CREATE: API comments`, () => {
   let newComment;
   let response;
 
-  beforeAll(() => {
-    app = createApp();
+  beforeAll(async () => {
+    app = await createApp();
     newComment = {
       text: `Оплата наличными или перевод на карту?`
     };
-    offerId = `_o8u33`;
+    offerId = `1`;
   });
 
   describe(`Correctly`, () => {
@@ -327,9 +319,9 @@ describe(`CREATE: API comments`, () => {
       expect(response.body).toEqual(expect.objectContaining(newComment));
     });
 
-    test(`Offer has four comments, count is changed`, async () => {
+    test(`Offer has five comments, count is changed`, async () => {
       const commentsRes = await request(app).get(`/offers/${offerId}/comments`);
-      expect(commentsRes.body.length).toBe(4);
+      expect(commentsRes.body.length).toBe(5);
     });
   });
 
@@ -360,10 +352,10 @@ describe(`DELETE: API comments`, () => {
   let commentId;
   let response;
 
-  beforeAll(() => {
-    app = createApp();
-    commentId = `6roIro`;
-    offerId = `_o8u33`;
+  beforeAll(async () => {
+    app = await createApp();
+    commentId = `1`;
+    offerId = `1`;
   });
 
   describe(`Correctly`, () => {
@@ -377,7 +369,7 @@ describe(`DELETE: API comments`, () => {
 
     test(`Comments count is changed`, async () => {
       const commentsRes = await request(app).get(`/offers/${offerId}/comments`);
-      expect(commentsRes.body.length).toBe(2);
+      expect(commentsRes.body.length).toBe(3);
     });
   });
 

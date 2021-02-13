@@ -2,38 +2,44 @@
 
 const express = require(`express`);
 const request = require(`supertest`);
+const Sequelize = require(`sequelize`);
 
+const initDB = require(`../../lib/init-db`);
 const categoryRoutes = require(`./category-routes`);
 const {CategoryService} = require(`../../data-service`);
 
-const mockData = [
+const mockCategories = [
+  `Животные`,
+  `Журналы`,
+  `Игры`
+];
+
+const mockOffers = [
   {
-    "id": `Kg-MYi`,
     "title": `Продам камаз или обменяю на Citroen.`,
     "picture": `item11.jpg`,
     "description": `Кажется что это хрупкая вещь. Имеется коробка и все документы. Если есть какие-то вопросы - пишите, на все отвечу :) Если товар не понравится — верну всё до последней копейки.`,
     "type": `SALE`,
     "sum": 22806,
-    "category": [`Животные`, `Детские товары`, `Журналы`, `Досуг и развлечения`, `Строительство и ремонт`, `Электроника`, `Книги`, `Посуда`, `Дача, сад и огород`, `Компьютерная техника`, `Бытовая техника`],
+    "categories": [`Животные`],
     "comments": [
-      {"id": `uyMlHh`, "text": `Оплата наличными или перевод на карту? Вы что?! В магазине дешевле.`},
-      {"id": `JNt4cp`, "text": `Почему в таком ужасном состоянии?`},
-      {"id": `BNs5Ex`, "text": `Неплохо, но дорого. Продаю в связи с переездом. Отрываю от сердца. А сколько игр в комплекте?`},
-      {"id": `hQ4ugJ`, "text": `С чем связана продажа? Почему так дешёво?`}
+      {"text": `Оплата наличными или перевод на карту? Вы что?! В магазине дешевле.`},
+      {"text": `Почему в таком ужасном состоянии?`},
+      {"text": `Неплохо, но дорого. Продаю в связи с переездом. Отрываю от сердца. А сколько игр в комплекте?`},
+      {"text": `С чем связана продажа? Почему так дешёво?`}
     ]
   },
   {
-    "id": `NF_ZYY`,
     "title": `Джинсовые сумки.`,
     "picture": `item07.jpg`,
     "description": `Никаких нареканий или недостатков. Все детали в рабочем состоянии. Кажется что это хрупкая вещь. Две страницы заляпаны свежим кофе.`,
     "type": `OFFER`,
     "sum": 30699,
-    "category": [`Спорт и отдых`, `Строительство и ремонт`, `Бизнес и оборудование`, `Бытовая техника`, `Разное`, `Посуда`, `Одежда`, `Игры`, `Компьютерная техника`, `Журналы`, `Досуг и развлечения`, `Электроника`],
+    "categories": [`Журналы`, `Игры`],
     "comments": [
-      {"id": `iSlMZ6`, "text": `А где блок питания? Неплохо, но дорого. Вы что?! В магазине дешевле.`},
-      {"id": `C7Dw3R`, "text": `Оплата наличными или перевод на карту?`},
-      {"id": `exg_fl`, "text": `А где блок питания? С чем связана продажа? Почему так дешёво? Продаю в связи с переездом. Отрываю от сердца.`}
+      {"text": `А где блок питания? Неплохо, но дорого. Вы что?! В магазине дешевле.`},
+      {"text": `Оплата наличными или перевод на карту?`},
+      {"text": `А где блок питания? С чем связана продажа? Почему так дешёво? Продаю в связи с переездом. Отрываю от сердца.`}
     ]
   }
 ];
@@ -42,12 +48,16 @@ const {HttpCode} = require(`../../../constants`);
 
 const app = express();
 app.use(express.json());
-categoryRoutes(app, new CategoryService(mockData));
+
+const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
 
 describe(`API returns category list`, () => {
   let response;
 
   beforeAll(async () => {
+    await initDB(mockDB, {categories: mockCategories, offers: mockOffers});
+    categoryRoutes(app, new CategoryService(mockDB));
+
     response = await request(app).get(`/categories`);
   });
 
@@ -55,24 +65,10 @@ describe(`API returns category list`, () => {
     expect(response.statusCode).toBe(HttpCode.OK);
   });
 
+  test(`Returns list of 3 categories`, () => expect(response.body.length).toBe(3));
+
   test(`Return Array of category name are "Журналы", "Игры", "Животные"`, () => {
-    expect(response.body).toEqual([
-      `Животные`,
-      `Детские товары`,
-      `Журналы`,
-      `Досуг и развлечения`,
-      `Строительство и ремонт`,
-      `Электроника`,
-      `Книги`,
-      `Посуда`,
-      `Дача, сад и огород`,
-      `Компьютерная техника`,
-      `Бытовая техника`,
-      `Спорт и отдых`,
-      `Бизнес и оборудование`,
-      `Разное`,
-      `Одежда`,
-      `Игры`
-    ]);
+    expect(response.body.map((it) => it.name))
+      .toEqual(expect.arrayContaining([`Журналы`, `Игры`, `Животные`]));
   });
 });

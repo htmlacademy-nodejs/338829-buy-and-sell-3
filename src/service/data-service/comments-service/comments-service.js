@@ -27,7 +27,7 @@ class CommentsService {
   }
 
   findOne(commentId) {
-    return this._Offer.findByPk(commentId);
+    return this._Comment.findByPk(commentId);
   }
 }
 
