@@ -1,7 +1,8 @@
 'use strict';
 
 const {Router} = require(`express`);
-const getMockData = require(`../lib/get-mock-data`);
+const sequelize = require(`../lib/sequelize`);
+const defineModels = require(`../models`);
 
 const categoryRoute = require(`./category-routes/category-routes`);
 const offersRoute = require(`./offers-routes/offers-routes`);
@@ -16,11 +17,12 @@ const {
 
 const routes = new Router();
 
+defineModels(sequelize);
+
 (async () => {
-  const mockData = await getMockData();
-  categoryRoute(routes, new CategoryService(mockData));
-  offersRoute(routes, new OffersService(mockData), new CommentsService());
-  searchRoute(routes, new SearchService(mockData));
+  categoryRoute(routes, new CategoryService(sequelize));
+  offersRoute(routes, new OffersService(sequelize), new CommentsService(sequelize));
+  searchRoute(routes, new SearchService(sequelize));
 })();
 
 module.exports = routes;

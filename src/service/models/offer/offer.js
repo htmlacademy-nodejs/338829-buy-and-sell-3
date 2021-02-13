@@ -1,6 +1,7 @@
 'use strict';
 
 const {DataTypes, Model} = require(`sequelize`);
+const Aliase = require(`../aliase`);
 
 class Offer extends Model { }
 
@@ -26,6 +27,6 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: `Offer`,
-    tableName: `offers`
+    tableName: Aliase.OFFERS
   });
 };

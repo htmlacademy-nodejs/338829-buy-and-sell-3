@@ -7,8 +7,8 @@ ul
         .ticket-card__info
           +ticketLabel(item.type)
           .ticket-card__categories
-            each category in item.category
-              a(href='#') #{category}
+            each category in item.categories
+              a(href='#') #{category.name}
           .ticket-card__header
             h3.ticket-card__title
               a(href='#') #{item.title}

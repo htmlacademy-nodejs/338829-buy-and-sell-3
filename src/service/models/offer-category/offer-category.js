@@ -1,12 +1,13 @@
 'use strict';
 
 const {Model} = require(`sequelize`);
+const Aliase = require(`../aliase`);
 
 class OfferCategory extends Model { }
 
 module.exports = (sequelize) => {
-  return OfferCategory .init({}, {
+  return OfferCategory.init({}, {
     sequelize,
-    tableName: `offer_categories`
+    tableName: Aliase.OFFER_CATEGORIES
   });
 };

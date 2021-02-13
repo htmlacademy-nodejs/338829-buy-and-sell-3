@@ -10,7 +10,7 @@ myRouter.get(`/`, async (req, res) => {
 });
 
 myRouter.get(`/comments`, async (req, res) => {
-  const allOffers = await axiosApi.getOffers();
+  const allOffers = await axiosApi.getOffers({comments: true});
   const offers = allOffers.slice(0, 3);
 
   const comments = await Promise.all(offers.map((offer) => axiosApi.getOfferComments(offer.id)));

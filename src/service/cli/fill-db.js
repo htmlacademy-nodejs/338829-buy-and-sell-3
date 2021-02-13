@@ -33,29 +33,26 @@ const {
 } = require(`../../utils`);
 
 
-const generateComments = ({count, comments, offerId, userCount}) => {
+const generateComments = ({count, comments, offerId}) => {
   return Array(count).fill({}).map(() => ({
     offerId,
-    userId: getRandomInt(1, userCount),
     text: shuffle(comments).slice(0, getRandomInt(CommentsRestrict.MIN, CommentsRestrict.MAX)).join(` `),
   }));
 };
 
-const generateOffers = ({count, titles, categories, sentences, comments, userCount}) => {
+const generateOffers = ({count, titles, categories, sentences, comments}) => {
   return Array(count).fill({}).map((_, index) => ({
     title: titles[getRandomInt(0, titles.length - 1)],
     picture: getPictureFileName(getRandomInt(PictureRestrict.MIN, PictureRestrict.MAX)),
     description: shuffle(sentences).slice(SentencesRestrict.MIN, SentencesRestrict.MAX).join(` `),
     type: Object.keys(OfferType)[Math.floor(Math.random() * Object.keys(OfferType).length)],
     sum: getRandomInt(SumRestrict.MIN, SumRestrict.MAX),
-    category: shuffle(categories).slice(0, getRandomInt(1, MAX_CATEGORIES)),
+    categories: shuffle(categories).slice(0, getRandomInt(1, MAX_CATEGORIES)),
     comments: generateComments({
       count: getRandomInt(1, MAX_COMMENTS),
       comments,
       offerId: index + 1,
-      userCount
-    }),
-    userId: getRandomInt(1, userCount)
+    })
   }));
 };
 
@@ -84,23 +81,6 @@ module.exports = {
     const {Category, Offer} = defineModels(sequelize);
     await sequelize.sync({force: true});
 
-    const users = [
-      {
-        email: `ivanov@example.com`,
-        passwordHash: `5f4dcc3b5aa765d61d8327deb882cf99`,
-        firstName: `Иван`,
-        lastName: `Иванов`,
-        avatar: `avatar1.jpg`
-      },
-      {
-        email: `petrov@example.com`,
-        passwordHash: `5f4dcc3b5aa765d61d8327deb882cf99`,
-        firstName: `Пётр`,
-        lastName: `Петров`,
-        avatar: `avatar2.jpg`
-      }
-    ];
-
     const [categories, sentences, titles, comments] = await Promise.all([
       readContent(FILE_CATEGORIES_PATH),
       readContent(FILE_SENTENCES_PATH),
@@ -113,15 +93,15 @@ module.exports = {
       categories,
       sentences,
       titles,
-      comments,
-      userCount: users.length
+      comments
     });
 
     await Category.bulkCreate(categories.map((item) => ({name: item})));
 
     const offerPromises = offers.map(async (offer) => {
       const offerModel = await Offer.create(offer, {include: [Aliase.COMMENTS]});
-      await offerModel.addCategories(offer.categories);
+      const categoryIds = offer.categories.map((_it, i) => i + 1);
+      await offerModel.addCategories(categoryIds);
     });
 
     await Promise.all(offerPromises);

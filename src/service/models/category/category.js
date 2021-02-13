@@ -1,6 +1,7 @@
 'use strict';
 
 const {DataTypes, Model} = require(`sequelize`);
+const Aliase = require(`../aliase`);
 
 class Category extends Model { }
 
@@ -13,6 +14,6 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: `Category`,
-    tableName: `categories`
+    tableName: Aliase.CATEGORIES
   });
 };

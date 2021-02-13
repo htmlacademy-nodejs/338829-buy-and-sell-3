@@ -7,7 +7,7 @@ module.exports = (app, searchService) => {
   const route = new Router();
   app.use(`/search`, route);
 
-  route.get(`/`, (req, res) => {
+  route.get(`/`, async (req, res) => {
     const {query: queryValue} = req.query;
 
     if (!queryValue) {
@@ -16,7 +16,7 @@ module.exports = (app, searchService) => {
         .send(`Bad request`);
     }
 
-    const offers = searchService.filter(queryValue);
+    const offers = await searchService.findOffers(queryValue);
 
     if (offers.length === 0) {
       return res
