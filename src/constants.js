@@ -53,7 +53,8 @@ const CliCommand = {
   VERSION: `--version`,
   GENERATE: `--generate`,
   SERVER: `--server`,
-  FILL: `--fill`
+  FILL: `--fill`,
+  FILL_DB: `--filldb`
 };
 
 const ExitCode = {

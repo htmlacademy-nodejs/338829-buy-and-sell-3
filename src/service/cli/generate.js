@@ -26,7 +26,8 @@ const {
 const {
   getRandomInt,
   shuffle,
-  checkNumParam
+  checkNumParam,
+  readContent
 } = require(`../../utils`);
 
 const getPictureFileName = (number) => {
@@ -60,16 +61,6 @@ const writeOffers = async (offers) => {
   } catch (error) {
     console.info(chalk.red(`Ошибка при создании данных`));
     process.exit(ExitCode.FATAL_EXCEPTION);
-  }
-};
-
-const readContent = async (filePath) => {
-  try {
-    const content = await fs.readFile(filePath, `utf-8`);
-    return content.trim().split(`\n`);
-  } catch (error) {
-    console.info(chalk.red(error));
-    return [];
   }
 };
 

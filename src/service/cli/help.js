@@ -17,6 +17,7 @@ const helpText = `
     ${CliCommand.HELP}:               печатает этот текст
     ${CliCommand.GENERATE} <count>    формирует файл ${FILE_MOCK_PATH}
     ${CliCommand.FILL}     <count>    формирует SQL для заполнения БД ${FILE_SQL_PATH}
+    ${CliCommand.FILL_DB}  <count>    заполняет БД mock данными
     ${CliCommand.SERVER}   <port>     запускает http сервер
 `;
 

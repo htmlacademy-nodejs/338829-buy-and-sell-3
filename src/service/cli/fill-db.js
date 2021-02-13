@@ -1,12 +1,14 @@
 'use strict';
 
 const chalk = require(`chalk`);
-const fs = require(`fs`).promises;
+const {getLogger} = require(`../lib/logger`);
+const sequelize = require(`../lib/sequelize`);
+const defineModels = require(`../models`);
+const Aliase = require(`../models/aliase`);
 
 const {
   CliCommand,
   DEFAULT_GENERATE_COUNT,
-  FILE_SQL_PATH,
   FILE_SENTENCES_PATH,
   FILE_TITLES_PATH,
   FILE_CATEGORIES_PATH,
@@ -57,90 +59,20 @@ const generateOffers = ({count, titles, categories, sentences, comments, userCou
   }));
 };
 
-const writeOffers = async ({offers, users, categories}) => {
-  try {
-    const comments = offers.flatMap((offer) => offer.comments);
-
-    const offerCategories = [];
-    offers.forEach((offer, index) => {
-      const offerId = index + 1;
-      offer.category.forEach((category) => {
-        offerCategories.push({
-          offerId,
-          categoryId: categories.indexOf(category)
-        });
-      });
-    });
-
-    const userValues = users.map((user) => {
-      const {email, passwordHash, firstName, lastName, avatar} = user;
-      return `('${email}', '${passwordHash}', '${firstName}', '${lastName}', '${avatar}')`;
-    });
-
-    const categoryValues = categories.map((name) => `('${name}')`);
-
-    const offerValues = offers.map((offer) => {
-      const {title, description, type, sum, picture, userId} = offer;
-      return `('${title}', '${description}', '${type}', ${sum}, '${picture}', ${userId})`;
-    });
-
-    const offerCategoryValues = offerCategories.map(({offerId, categoryId}) => {
-      return `(${offerId}, ${categoryId})`;
-    });
-
-    const commentValues = comments.map((comment) => {
-      const {text, userId, offerId} = comment;
-      return `('${text}', ${userId}, ${offerId})`;
-    });
-
-    const insertValues = (values) => values.join(`,\n`);
-
-    const content = (`
--- Add users
-INSERT INTO users(email, password_hash, first_name, last_name, avatar) VALUES
-${insertValues(userValues)};
-
--- Add categories
-INSERT INTO categories(name) VALUES
-${insertValues(categoryValues)};
-
--- Add offers
-ALTER TABLE offers DISABLE TRIGGER ALL;
-
-INSERT INTO offers(title, description, type, sum, picture, user_id) VALUES
-${insertValues(offerValues)};
-
-ALTER TABLE offers ENABLE TRIGGER ALL;
-
--- Add offer categories
-ALTER TABLE offer_categories DISABLE TRIGGER ALL;
-
-INSERT INTO offer_categories(offer_id, category_id) VALUES
-${insertValues(offerCategoryValues)};
-
-ALTER TABLE offer_categories ENABLE TRIGGER ALL;
-
--- Add comments
-ALTER TABLE comments DISABLE TRIGGER ALL;
-
-INSERT INTO COMMENTS(text, user_id, offer_id) VALUES
-${insertValues(commentValues)};
-
-ALTER TABLE comments ENABLE TRIGGER ALL;
--- end
-    `).trim();
-
-    await fs.writeFile(FILE_SQL_PATH, content);
-    console.info(chalk.green(`Данные в количестве [${offers.length}] успешно сформированы в файл ${FILE_SQL_PATH}`));
-  } catch (error) {
-    console.info(chalk.red(`Ошибка при создании данных`));
-    process.exit(ExitCode.FATAL_EXCEPTION);
-  }
-};
-
 module.exports = {
-  name: CliCommand.FILL,
+  name: CliCommand.FILL_DB,
   async run(args = []) {
+    const logger = getLogger({name: `db`});
+    try {
+      logger.info(`Trying to connect to database...`);
+      await sequelize.authenticate();
+    } catch (err) {
+      logger.error(`An error occured: ${err.message}`);
+      process.exit(ExitCode.FATAL_EXCEPTION);
+    }
+
+    logger.info(`Connection to database established`);
+
     const [userCount] = args;
     const countOffer = checkNumParam(userCount, DEFAULT_GENERATE_COUNT);
 
@@ -148,6 +80,9 @@ module.exports = {
       console.info(chalk.red(`Не больше ${MAX_MOCK_ITEMS} объявлений`));
       return;
     }
+
+    const {Category, Offer} = defineModels(sequelize);
+    await sequelize.sync({force: true});
 
     const users = [
       {
@@ -182,6 +117,13 @@ module.exports = {
       userCount: users.length
     });
 
-    writeOffers({offers, users, categories});
+    await Category.bulkCreate(categories.map((item) => ({name: item})));
+
+    const offerPromises = offers.map(async (offer) => {
+      const offerModel = await Offer.create(offer, {include: [Aliase.COMMENTS]});
+      await offerModel.addCategories(offer.categories);
+    });
+
+    await Promise.all(offerPromises);
   }
 };
