@@ -1,6 +1,11 @@
 extends ../layout
 
 block content
+  -
+    const getSelected = (categories, id) => {
+      return Boolean(categories.find((cat) => cat.id === id));
+    };
+
   main.page-content
     section.ticket-form
       .ticket-form__wrapper
@@ -31,7 +36,7 @@ block content
                   each category in categories
                     option(
                       value=category.id
-                      selected=ticket.categories.includes(category.id)
+                      selected=getSelected(ticket.categories, category.id)
                     ) #{category.name}
               .ticket-form__row
                 .form__field.form__field--price

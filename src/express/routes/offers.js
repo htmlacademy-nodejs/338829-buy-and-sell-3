@@ -9,14 +9,19 @@ const {getCategoryOffer} = require(`../../utils`);
 const offersRouter = new Router();
 
 offersRouter.get(`/category/:id`, async (req, res) => {
-  const hasCount = true;
+  const {id} = req.params;
 
+  const hasCount = true;
   const [offers, categories] = await Promise.all([
     axiosApi.getOffers(),
     axiosApi.getCategories(hasCount)
   ]);
 
-  res.render(`pages/category`, {tickets: offers, categories});
+  res.render(`pages/category`, {
+    tickets: offers,
+    categories,
+    id
+  });
 });
 
 offersRouter.get(`/add`, async (req, res) => {
@@ -64,7 +69,6 @@ offersRouter.get(`/edit/:id`, async (req, res) => {
 
     res.render(`pages/ticket-edit`, {ticket: offer, categories});
   } catch (error) {
-    console.log(error);
     res
       .status(HttpCode.NOT_FOUND)
       .render(`errors/404`);

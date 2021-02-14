@@ -1,6 +1,11 @@
 extends ../layout
 
 block content
+  -
+    const getCategory = (categories, id) => {
+      return categories.find((cat) => cat.id === Number(id));
+    };
+    const categoty = getCategory(categories, id);
   main.page-content
     include ../partials/categories
     section.tickets-list
@@ -8,8 +13,9 @@ block content
       .tickets-list__wrapper
         .tickets-list__header
           p.tickets-list__title
-            | Электроника
-            b.js-qty 62
+            | #{categoty.name}
+            b.js-qty
+              | #{` `}#{categoty.count}
         ul
           li.tickets-list__item
             .ticket-card.ticket-card--color06
