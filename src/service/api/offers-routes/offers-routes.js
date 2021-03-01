@@ -14,12 +14,14 @@ module.exports = (app, offersService, commentsService) => {
   app.use(`/offers`, route);
 
   route.get(`/`, async (req, res) => {
-    const hasComments = Boolean(req.query.comments);
-    const offers = await offersService.findAll(hasComments);
+    const {comments, limit, offset} = req.query;
+
+    const hasComments = Boolean(comments);
+    const result = limit || offset ? await offersService.findPage(limit, offset, hasComments) : await offersService.findAll(hasComments);
 
     return res
       .status(HttpCode.OK)
-      .json(offers);
+      .json(result);
   });
 
   route.post(`/`, offerValidator, async (req, res) => {

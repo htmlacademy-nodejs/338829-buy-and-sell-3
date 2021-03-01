@@ -72,11 +72,11 @@ describe(`READ: API offers`, () => {
     });
 
     test(`Returns a list of 2 offers`, () => {
-      expect(response.body.length).toBe(2);
+      expect(response.body.offers.length).toBe(2);
     });
 
     test(`First Offer id equals 1`, () => {
-      expect(response.body[0].id).toBe(1);
+      expect(response.body.offers[0].id).toBe(1);
     });
   });
 });
@@ -148,7 +148,7 @@ describe(`CREATE: API offer`, () => {
 
     test(`Offers count is changed`, async () => {
       const offersRes = await request(app).get(`/offers`);
-      expect(offersRes.body.length).toBe(3);
+      expect(offersRes.body.offers.length).toBe(3);
     });
   });
 
@@ -240,7 +240,7 @@ describe(`DELETE: API offer`, () => {
 
     test(`Offers count is changed`, async () => {
       const offersRes = await request(app).get(`/offers`);
-      expect(offersRes.body.length).toBe(1);
+      expect(offersRes.body.offers.length).toBe(1);
     });
   });
 

@@ -33,7 +33,25 @@ class OffersService {
     const offers = await this._Offer.findAll({
       include: hasComments ? [Aliase.CATEGORIES, Aliase.COMMENTS] : [Aliase.CATEGORIES]
     });
-    return offers.map((item) => item.get());
+
+    return {
+      count: offers.length,
+      offers: offers.map((item) => item.get())
+    };
+  }
+
+  async findPage(limit, offset, hasComments) {
+    const {count, rows} = await this._Offer.findAndCountAll({
+      limit,
+      offset,
+      include: hasComments ? [Aliase.CATEGORIES, Aliase.COMMENTS] : [Aliase.CATEGORIES],
+      distinct: true
+    });
+
+    return {
+      count,
+      offers: rows
+    };
   }
 
   findOne(id, hasComments) {

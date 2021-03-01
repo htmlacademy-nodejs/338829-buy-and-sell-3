@@ -23,6 +23,8 @@ const MAX_CATEGORIES = 4;
 const API_PREFIX = `/api`;
 const API_TIMEOUT = 1000;
 
+const OFFERS_PER_PAGE = 8;
+
 const OfferType = {
   OFFER: `offer`,
   SALE: `sale`,
@@ -106,6 +108,7 @@ module.exports = {
   API_PREFIX,
   API_TIMEOUT,
   FILE_API_LOG_PATH,
+  OFFERS_PER_PAGE,
   OfferType,
   SumRestrict,
   PictureRestrict,

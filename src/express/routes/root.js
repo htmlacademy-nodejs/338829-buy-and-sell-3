@@ -2,18 +2,30 @@
 
 const {axiosApi} = require(`../axios-api/axios-api`);
 const {Router} = require(`express`);
+const {OFFERS_PER_PAGE} = require(`../../constants`);
+
 const rootRouter = new Router();
 
 rootRouter.get(`/`, async (req, res) => {
-  const hasCount = true;
+  const {page = 1} = req.query;
 
-  const [offers, categories] = await Promise.all([
-    axiosApi.getOffers(),
-    axiosApi.getCategories(hasCount)
+  const limit = OFFERS_PER_PAGE;
+  const offset = (Number(page) - 1) * limit;
+
+  const [{count, offers}, categories] = await Promise.all([
+    axiosApi.getOffers({limit, offset}),
+    axiosApi.getCategories({count: true})
   ]);
 
   if (offers.length > 0) {
-    res.render(`pages/main`, {tickets: offers, categories});
+    const total = Math.ceil(count / OFFERS_PER_PAGE);
+
+    res.render(`pages/main`, {
+      tickets: offers,
+      categories,
+      page,
+      totalPages: total
+    });
   } else {
     res.render(`pages/main-empty`);
   }
