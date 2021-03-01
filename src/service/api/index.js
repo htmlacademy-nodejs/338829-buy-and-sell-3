@@ -1,7 +1,7 @@
 'use strict';
 
 const {Router} = require(`express`);
-const sequelize = require(`../lib/sequelize`);
+const createSequelize = require(`../lib/sequelize`);
 const defineModels = require(`../models`);
 
 const categoryRoute = require(`./category-routes/category-routes`);
@@ -17,9 +17,11 @@ const {
 
 const routes = new Router();
 
-defineModels(sequelize);
 
 (async () => {
+  const sequelize = createSequelize();
+  defineModels(sequelize);
+
   categoryRoute(routes, new CategoryService(sequelize));
   offersRoute(routes, new OffersService(sequelize), new CommentsService(sequelize));
   searchRoute(routes, new SearchService(sequelize));

@@ -10,7 +10,7 @@ if (hasIncorrectSettings) {
   throw new Error(`Проверь настройки DB!`);
 }
 
-module.exports = new Sequelize(
+module.exports = () => new Sequelize(
     DB_NAME, DB_USER, DB_PASSWORD, {
       host: DB_HOST,
       port: DB_PORT,

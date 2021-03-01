@@ -2,7 +2,7 @@
 
 const chalk = require(`chalk`);
 const {getLogger} = require(`../lib/logger`);
-const sequelize = require(`../lib/sequelize`);
+const createSequelize = require(`../lib/sequelize`);
 const initDB = require(`../lib/init-db`);
 
 const {
@@ -59,6 +59,8 @@ module.exports = {
   name: CliCommand.FILL_DB,
   async run(args = []) {
     const logger = getLogger({name: `db`});
+    const sequelize = createSequelize();
+
     try {
       logger.info(`Trying to connect to database...`);
       await sequelize.authenticate();
