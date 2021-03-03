@@ -4,7 +4,6 @@ const Aliase = require(`../../models/aliase`);
 
 class OffersService {
   constructor(sequelize) {
-    this._sequelize = sequelize;
     this._Offer = sequelize.models.Offer;
     this._Comment = sequelize.models.Comment;
     this._Category = sequelize.models.Category;
