@@ -4,9 +4,11 @@ const Aliase = require(`../../models/aliase`);
 
 class OffersService {
   constructor(sequelize) {
+    this._sequelize = sequelize;
     this._Offer = sequelize.models.Offer;
     this._Comment = sequelize.models.Comment;
     this._Category = sequelize.models.Category;
+    this._OfferCategory = sequelize.models.OfferCategory;
   }
 
   async create(newOffer) {
@@ -51,6 +53,38 @@ class OffersService {
     return {
       count,
       offers: rows
+    };
+  }
+
+  async findInCategory(limit, offset, catId) {
+    const include = [{
+      model: this._Category,
+      as: Aliase.CATEGORIES,
+      where: {
+        id: catId
+      }
+    }];
+
+    if (limit || offset) {
+      const {count, rows} = await this._Offer.findAndCountAll({
+        limit,
+        offset,
+        include,
+        distinct: true
+      });
+
+      return {
+        count,
+        offers: rows
+      };
+    }
+
+    const result = await this._Offer.findAll({include});
+    const offers = result.map((it) => it.get());
+
+    return {
+      count: offers.length,
+      offers
     };
   }
 

@@ -5,22 +5,30 @@ const {pictureUpload} = require(`../middlewares`);
 const {axiosApi} = require(`../axios-api/axios-api`);
 const {HttpCode} = require(`../../constants`);
 const {getCategoryOffer} = require(`../../utils`);
+const {OFFERS_PER_PAGE} = require(`../../constants`);
 
 const offersRouter = new Router();
 
 offersRouter.get(`/category/:id`, async (req, res) => {
   const {id} = req.params;
+  const {page = 1} = req.query;
 
-  const hasCount = true;
-  const [offers, categories] = await Promise.all([
-    axiosApi.getOffers(),
-    axiosApi.getCategories(hasCount)
+  const limit = OFFERS_PER_PAGE;
+  const offset = (Number(page) - 1) * limit;
+
+  const [{count, offers}, categories] = await Promise.all([
+    axiosApi.getOffers({limit, offset, catId: id}),
+    axiosApi.getCategories({count: true})
   ]);
+
+  const total = Math.ceil(count / OFFERS_PER_PAGE);
 
   res.render(`pages/category`, {
     tickets: offers,
     categories,
-    id
+    id,
+    page: Number(page),
+    totalPages: total
   });
 });
 
@@ -64,7 +72,7 @@ offersRouter.get(`/edit/:id`, async (req, res) => {
     const {id} = req.params;
     const [categories, offer] = await Promise.all([
       axiosApi.getCategories(),
-      axiosApi.getOffer(id)
+      axiosApi.getOffer({id})
     ]);
 
     res.render(`pages/ticket-edit`, {ticket: offer, categories});
@@ -78,8 +86,7 @@ offersRouter.get(`/edit/:id`, async (req, res) => {
 offersRouter.get(`/:id`, async (req, res) => {
   try {
     const {id} = req.params;
-    const hasComments = true;
-    const offer = await axiosApi.getOffer(id, hasComments);
+    const offer = await axiosApi.getOffer({id, comments: true});
 
     res.render(`pages/ticket`, {ticket: offer});
   } catch (error) {

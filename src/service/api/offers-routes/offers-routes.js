@@ -14,10 +14,22 @@ module.exports = (app, offersService, commentsService) => {
   app.use(`/offers`, route);
 
   route.get(`/`, async (req, res) => {
-    const {comments, limit, offset} = req.query;
-
+    const {comments, limit, offset, catId} = req.query;
     const hasComments = Boolean(comments);
-    const result = limit || offset ? await offersService.findPage(limit, offset, hasComments) : await offersService.findAll(hasComments);
+
+    let result;
+    if (catId > 0) {
+      result = await offersService.findInCategory(limit, offset, catId);
+      return res
+        .status(HttpCode.OK)
+        .json(result);
+    }
+
+    if (limit || offset) {
+      result = await offersService.findPage(limit, offset, hasComments);
+    } else {
+      result = await offersService.findAll(hasComments);
+    }
 
     return res
       .status(HttpCode.OK)

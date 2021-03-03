@@ -23,7 +23,7 @@ rootRouter.get(`/`, async (req, res) => {
     res.render(`pages/main`, {
       tickets: offers,
       categories,
-      page,
+      page: Number(page),
       totalPages: total
     });
   } else {

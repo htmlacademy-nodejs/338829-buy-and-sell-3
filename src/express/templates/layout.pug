@@ -5,12 +5,9 @@ mixin ticketPicture(picture = `blank.png`, title)
   // img(src='/img/' + picture srcset='/img/item02@2x.jpg 2x' alt=title)
   img(src='/img/' + picture alt=title)
 
--
-  const getRandomInt = (max) => Math.ceil(Math.random()*max);
-
 mixin categoryImage(category)
   -
-    const idPadded = `0${getRandomInt(6)}`
+    const idPadded = category.id > 6 ? `` : `0${category.id}`
 
   img(src=`/img/cat${idPadded}.jpg` srcset=`/img/cat${idPadded}@2x.jpg 2x` alt=category.name)
 
