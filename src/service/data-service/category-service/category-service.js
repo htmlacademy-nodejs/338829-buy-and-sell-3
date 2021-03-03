@@ -11,7 +11,7 @@ class CategoryService {
   async findAll(hasCount) {
     if (hasCount) {
       const query = `
-        SELECT "Category"."name", "Category"."id", count(DISTINCT("offerCategories"."CategoryId")) AS "count"
+        SELECT "Category"."name", "Category"."id", count("offerCategories"."CategoryId") AS "count"
         FROM "categories" AS "Category"
         LEFT OUTER JOIN "offerCategories" AS "offerCategories" ON "Category"."id" = "offerCategories"."CategoryId"
         GROUP BY "Category"."id";

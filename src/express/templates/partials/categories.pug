@@ -12,6 +12,5 @@ section.categories-list
           span.category-tile__image
             +categoryImage(category)
           span.category-tile__label
-            | #{category.name}
-            |
+            | #{category.name}#{` `}
             span.category-tile__qty.js-qty #{category.count}
