@@ -25,6 +25,7 @@ module.exports = (app, offersService, commentsService) => {
         .json(result);
     }
 
+    console.log(req.query);
     if (limit || offset) {
       result = await offersService.findPage(limit, offset, hasComments);
     } else {
@@ -40,7 +41,10 @@ module.exports = (app, offersService, commentsService) => {
     const offer = await offersService.create(req.body);
     return res
       .status(HttpCode.CREATED)
-      .json(offer);
+      .json({
+        message: `A new offer created`,
+        data: offer
+      });
   });
 
   route.get(`/:offerId`, offerExist(offersService), (req, res) => {
@@ -55,7 +59,10 @@ module.exports = (app, offersService, commentsService) => {
     const updated = await offersService.update(offerId, req.body);
     return res
       .status(HttpCode.NO_CONTENT)
-      .send(updated);
+      .json({
+        message: `Offer ${offerId} is updated`,
+        data: updated
+      });
   });
 
   route.delete(`/:offerId`, offerExist(offersService), async (req, res) => {
@@ -72,7 +79,10 @@ module.exports = (app, offersService, commentsService) => {
 
     return res
       .status(HttpCode.CREATED)
-      .json(comment);
+      .json({
+        message: `A new comment created`,
+        data: comment
+      });
   });
 
   route.get(`/:offerId/comments`, offerExist(offersService), async (req, res) => {
