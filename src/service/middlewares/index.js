@@ -5,12 +5,16 @@ const offerExist = require(`./offer-exist/offer-exist`);
 const commentExist = require(`./comment-exist/comment-exist`);
 const requestLogger = require(`./request-logger/request-logger`);
 
-const {offerSchema, commentSchema} = require(`../schemes`);
+const {
+  offerSchema,
+  commentSchema,
+  idSchema
+} = require(`../schemes`);
 
 module.exports = {
-  offerExist,
-  commentExist,
   requestLogger,
+  offerExist: offerExist(idSchema),
+  commentExist: commentExist(idSchema),
   offerValidator: joiValidator(offerSchema),
   commentValidator: joiValidator(commentSchema),
 };
