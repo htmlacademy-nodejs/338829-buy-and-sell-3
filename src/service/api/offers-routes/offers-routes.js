@@ -25,7 +25,6 @@ module.exports = (app, offersService, commentsService) => {
         .json(result);
     }
 
-    console.log(req.query);
     if (limit || offset) {
       result = await offersService.findPage(limit, offset, hasComments);
     } else {

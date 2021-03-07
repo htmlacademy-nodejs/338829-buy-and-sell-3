@@ -103,17 +103,31 @@ describe(`READ: API offer`, () => {
     });
   });
 
-  describe(`Incorrectly: with given id`, () => {
+  describe(`Incorrectly: with given incorrectly id = NOEXST`, () => {
     beforeAll(async () => {
       response = await request(app).get(`/offers/NOEXST`);
+    });
+
+    test(`Status code 400`, () => {
+      expect(response.statusCode).toBe(HttpCode.BAD_REQUEST);
+    });
+
+    test(`Response text to equal "\"id\" must be a number"`, () => {
+      expect(response.text).toBe(`\"id\" must be a number`);
+    });
+  });
+
+  describe(`Incorrectly: with given correctly id = 10`, () => {
+    beforeAll(async () => {
+      response = await request(app).get(`/offers/10`);
     });
 
     test(`Status code 404`, () => {
       expect(response.statusCode).toBe(HttpCode.NOT_FOUND);
     });
 
-    test(`Response text to equal "Offer with NOEXST not found"`, () => {
-      expect(response.text).toBe(`Offer with NOEXST not found`);
+    test(`Response text to equal "Offer with 10 not found"`, () => {
+      expect(response.text).toBe(`Offer with 10 not found`);
     });
   });
 });
@@ -128,9 +142,9 @@ describe(`CREATE: API offer`, () => {
     newOffer = {
       "title": `Продам гараж`,
       "picture": `item02.jpg`,
-      "description": `Никаких нареканий или недостатков.`,
-      "type": `OFFER`,
-      "sum": 100,
+      "description": `Никаких нареканий или недостатков. Мой дед не мог её сломать. Любые проверки на месте`,
+      "type": `offer`,
+      "sum": 1000,
       "categories": [`1`]
     };
   });
@@ -179,8 +193,8 @@ describe(`UPDATE: API offer`, () => {
     updateOffer = {
       "title": `Продам НОВЫЙ гараж`,
       "picture": `item02.jpg`,
-      "description": `Без дверей`,
-      "type": `OFFER`,
+      "description": `Без дверей, Мой дед не мог её сломать. Любые проверки на месте`,
+      "type": `sale`,
       "sum": 101,
       "categories": [`Гараж`]
     };
@@ -199,9 +213,17 @@ describe(`UPDATE: API offer`, () => {
   });
 
   describe(`Incorrectly`, () => {
-    test(`API returns status code 404 when trying to change non-existent offer`, async () => {
+    test(`API returns status code 400 when trying to change offer id = NOEXST`, async () => {
       const notFoundResponse = await request(app)
         .put(`/offers/NOEXST`)
+        .send(updateOffer);
+
+      expect(notFoundResponse.statusCode).toBe(HttpCode.BAD_REQUEST);
+    });
+
+    test(`API returns status code 404 when trying to change offer id = 10`, async () => {
+      const notFoundResponse = await request(app)
+        .put(`/offers/10`)
         .send(updateOffer);
 
       expect(notFoundResponse.statusCode).toBe(HttpCode.NOT_FOUND);
@@ -245,8 +267,13 @@ describe(`DELETE: API offer`, () => {
   });
 
   describe(`Incorrectly`, () => {
-    test(`API returns status code 404 when trying to delete non-existent offer`, async () => {
-      const notFoundResponse = await request(app).put(`/offers/NOEXST`);
+    test(`API returns status code 400 when trying to delete non-existent offer`, async () => {
+      const notFoundResponse = await request(app).delete(`/offers/NOEXST`);
+      expect(notFoundResponse.statusCode).toBe(HttpCode.BAD_REQUEST);
+    });
+
+    test(`API returns status code 404 when trying to change offer id = 10`, async () => {
+      const notFoundResponse = await request(app).delete(`/offers/10`);
       expect(notFoundResponse.statusCode).toBe(HttpCode.NOT_FOUND);
     });
   });
@@ -275,17 +302,31 @@ describe(`READ: API comments`, () => {
     });
   });
 
-  describe(`Incorrectly`, () => {
+  describe(`Incorrectly offerId = NOEXST`, () => {
     beforeAll(async () => {
       response = await request(app).get(`/offers/NOEXST/comments`);
+    });
+
+    test(`Status code 400`, () => {
+      expect(response.statusCode).toBe(HttpCode.BAD_REQUEST);
+    });
+
+    test(`Response text to equal "\"id\" must be a number"`, () => {
+      expect(response.text).toBe(`\"id\" must be a number`);
+    });
+  });
+
+  describe(`Correctly offerId = 10`, () => {
+    beforeAll(async () => {
+      response = await request(app).get(`/offers/10/comments`);
     });
 
     test(`Status code 404`, () => {
       expect(response.statusCode).toBe(HttpCode.NOT_FOUND);
     });
 
-    test(`Response text to equal "Offer with NOEXST not found"`, () => {
-      expect(response.text).toBe(`Offer with NOEXST not found`);
+    test(`Response text to equal "Offer with 10 not found"`, () => {
+      expect(response.text).toBe(`Offer with 10 not found`);
     });
   });
 });
@@ -315,8 +356,10 @@ describe(`CREATE: API comments`, () => {
       expect(response.statusCode).toBe(HttpCode.CREATED);
     });
 
-    test(`Return new offer`, () => {
-      expect(response.body).toEqual(expect.objectContaining(newComment));
+    test(`Return new comment`, () => {
+      expect(response.body.data).toEqual(expect.objectContaining({
+        text: `Оплата наличными или перевод на карту?`
+      }));
     });
 
     test(`Offer has five comments, count is changed`, async () => {
@@ -328,12 +371,12 @@ describe(`CREATE: API comments`, () => {
   describe(`Incorrectly`, () => {
     const badComment = {};
 
-    test(`Status code 404 with non-existent offer`, async () => {
+    test(`Status code 400 with non-existent offer`, async () => {
       const notfoundResponse = await request(app)
         .post(`/offers/NOEXST/comments`)
         .send(badComment);
 
-      expect(notfoundResponse.statusCode).toBe(HttpCode.NOT_FOUND);
+      expect(notfoundResponse.statusCode).toBe(HttpCode.BAD_REQUEST);
     });
 
     test(`Status code 400, invalid comment`, async () => {
@@ -342,6 +385,14 @@ describe(`CREATE: API comments`, () => {
         .send(badComment);
 
       expect(badResponse.statusCode).toBe(HttpCode.BAD_REQUEST);
+    });
+
+    test(`Status code 404 with not found offer`, async () => {
+      const notfoundResponse = await request(app)
+        .post(`/offers/10/comments`)
+        .send(badComment);
+
+      expect(notfoundResponse.statusCode).toBe(HttpCode.NOT_FOUND);
     });
   });
 });
@@ -373,14 +424,26 @@ describe(`DELETE: API comments`, () => {
     });
   });
 
-  describe(`Incorrectly`, () => {
-    test(`Status code 404 with non-existent offer`, async () => {
+  describe(`Incorrectly offerId & commentId`, () => {
+    test(`Status code 400 with non-existent offer`, async () => {
       const notfoundResponse = await request(app).delete(`/offers/NOEXST/comments/${commentId}`);
+      expect(notfoundResponse.statusCode).toBe(HttpCode.BAD_REQUEST);
+    });
+
+    test(`Status code 400 with non-existent comment`, async () => {
+      const notfoundResponse = await request(app).delete(`/offers/${offerId}/comments/NOEXST`);
+      expect(notfoundResponse.statusCode).toBe(HttpCode.BAD_REQUEST);
+    });
+  });
+
+  describe(`Correctly Not found`, () => {
+    test(`Status code 404 with non-existent offer`, async () => {
+      const notfoundResponse = await request(app).delete(`/offers/10/comments/${commentId}`);
       expect(notfoundResponse.statusCode).toBe(HttpCode.NOT_FOUND);
     });
 
     test(`Status code 404 with non-existent comment`, async () => {
-      const notfoundResponse = await request(app).delete(`/offers/${offerId}/comments/NOEXST`);
+      const notfoundResponse = await request(app).delete(`/offers/${offerId}/comments/100`);
       expect(notfoundResponse.statusCode).toBe(HttpCode.NOT_FOUND);
     });
   });
