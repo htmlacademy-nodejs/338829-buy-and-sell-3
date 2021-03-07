@@ -8,7 +8,7 @@ section.categories-list
   ul.categories-list__wrapper
     each category in categories
       li.categories-list__item
-        a.category-tile.category-tile--default(href='/offers/category/' + category.id class=getActive(category.id, id))
+        a.category-tile(href='/offers/category/' + category.id class=getActive(category.id, id))
           span.category-tile__image
             +categoryImage(category)
           span.category-tile__label
