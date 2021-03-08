@@ -59,6 +59,7 @@ const getErrorMessage = (messages = []) => {
     errorMessage[key] = text;
   });
 
+  console.log(errorMessage);
   return errorMessage;
 };
 

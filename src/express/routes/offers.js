@@ -44,7 +44,7 @@ offersRouter.get(`/add`, async (req, res) => {
   });
 });
 
-offersRouter.post(`/add`, pictureUpload.single(`avatar`), async (req, res) => {
+offersRouter.post(`/add`, pictureUpload.single(`picture`), async (req, res) => {
   const {body, file} = req;
 
   const newOffer = {
@@ -77,11 +77,48 @@ offersRouter.get(`/edit/:id`, async (req, res) => {
       axiosApi.getOffer({id})
     ]);
 
-    res.render(`pages/ticket-edit`, {ticket: offer, categories});
+    const editOffer = {
+      ...offer,
+      categories: offer.categories.map((cat) => String(cat.id))
+    };
+
+    res.render(`pages/ticket-edit`, {
+      offerId: id,
+      ticket: editOffer,
+      categories,
+      message: {}
+    });
   } catch (error) {
     res
       .status(HttpCode.NOT_FOUND)
       .render(`errors/404`);
+  }
+});
+
+offersRouter.post(`/edit/:id`, pictureUpload.single(`picture`), async (req, res) => {
+  const {body, file} = req;
+  const {id} = req.params;
+
+  const editOffer = {
+    title: body.title,
+    description: body.description,
+    picture: file && file.filename || `blank.png`,
+    sum: body.sum,
+    type: body.type,
+    categories: getCategoryOffer(body.categories)
+  };
+
+  try {
+    await axiosApi.updateOffer(Number(id), editOffer);
+    res.redirect(`/my`);
+  } catch (err) {
+    const categories = await axiosApi.getCategories();
+    res.render(`pages/ticket-edit`, {
+      offerId: id,
+      ticket: editOffer,
+      categories,
+      message: getErrorMessage(err.response.data.message)
+    });
   }
 });
 
