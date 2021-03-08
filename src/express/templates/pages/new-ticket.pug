@@ -22,18 +22,21 @@ block content
                   input#ticket-name.js-field(type='text' name='title' value=newOffer.title required)
                   label(for='ticket-name') Название
                   span Обязательное поле
+                  +errorFormEl(message.title)
               .ticket-form__row
                 .form__field
                   textarea#comment-field.js-field(name='description' cols='30' rows='10' maxlength='400' minlength='50') #{newOffer.description}
                   label(for='comment-field') Описание
                   span Обязательное поле
+                  +errorFormEl(message.description)
               .ticket-form__row
                 select#category-field.form__select.js-multiple-select(name='categories' data-label='Выбрать категорию публикации' multiple)
                   each category in categories
                     option(
                       value=category.id
-                      selected=newOffer.categories.includes(category.id)
+                      selected=newOffer.categories.includes(String(category.id))
                     ) #{category.name}
+              +errorFormEl(message.categories)
               .ticket-form__row
                 .form__field.form__field--price
                   input#price-field.js-field.js-price(type='number' name='sum' min='1' value=newOffer.sum required)
@@ -41,9 +44,11 @@ block content
                   span Обязательное поле
                 .form__switch.switch
                   .switch__item
-                    input#buy-field.visually-hidden(type='radio' name='type' value='buy' checked=(newOffer.type === 'buy'))
+                    input#buy-field.visually-hidden(type='radio' name='type' value='offer' checked=(newOffer.type === 'offer'))
                     label.switch__button(for='buy-field') Куплю
                   .switch__item
-                    input#sell-field.visually-hidden(type='radio' name='type' value='sell' checked=(newOffer.type === 'sell'))
+                    input#sell-field.visually-hidden(type='radio' name='type' value='sale' checked=(newOffer.type === 'sale'))
                     label.switch__button(for='sell-field') Продам
+              +errorFormEl(message.sum)
+              +errorFormEl(message.type)
             button.form__button.btn.btn--medium.js-button(type='submit') Опубликовать

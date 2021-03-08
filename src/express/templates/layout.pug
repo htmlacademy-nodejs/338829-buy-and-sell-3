@@ -49,6 +49,10 @@ mixin pagination(page, totalPages, width, prefix = '?')
         li
           a(href=`${prefix}page=${page + 1}`) дальше
 
+mixin errorFormEl(errorText)
+  if errorText
+    p(style="color: red") #{errorText}
+
 doctype html
 html(lang="ru")
   head

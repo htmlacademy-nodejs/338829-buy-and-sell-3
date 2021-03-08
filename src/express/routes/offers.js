@@ -4,7 +4,7 @@ const {Router} = require(`express`);
 const {pictureUpload} = require(`../middlewares`);
 const {axiosApi} = require(`../axios-api/axios-api`);
 const {HttpCode} = require(`../../constants`);
-const {getCategoryOffer} = require(`../../utils`);
+const {getCategoryOffer, getErrorMessage} = require(`../../utils`);
 const {OFFERS_PER_PAGE} = require(`../../constants`);
 
 const offersRouter = new Router();
@@ -39,7 +39,8 @@ offersRouter.get(`/add`, async (req, res) => {
     newOffer: {
       categories: [],
       picture: `blank.png`
-    }
+    },
+    message: {}
   });
 });
 
@@ -58,11 +59,12 @@ offersRouter.post(`/add`, pictureUpload.single(`avatar`), async (req, res) => {
   try {
     await axiosApi.createOffer(newOffer);
     res.redirect(`/my`);
-  } catch (e) {
+  } catch (err) {
     const categories = await axiosApi.getCategories();
     res.render(`pages/new-ticket`, {
       categories,
-      newOffer
+      newOffer,
+      message: getErrorMessage(err.response.data.message)
     });
   }
 });

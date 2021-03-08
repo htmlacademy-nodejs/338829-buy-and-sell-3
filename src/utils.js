@@ -25,11 +25,11 @@ const checkNumParam = (value, defaultValue) => {
 
 const getCategoryOffer = (categories) => {
   if (Array.isArray(categories)) {
-    return categories.map((id) => Number(id));
+    return categories;
   }
 
   if (typeof categories === `string`) {
-    return [Number(categories)];
+    return [categories];
   }
 
   return [];
@@ -49,11 +49,25 @@ const readContent = async (filePath) => {
   }
 };
 
+const getErrorMessage = (messages = []) => {
+  const errorMessage = {};
+
+  messages.forEach((message) => {
+    const regExp = new RegExp(/"(.*?)"/gi);
+    const [, key] = regExp.exec(message);
+    const text = message.replace(regExp, ``).trim();
+    errorMessage[key] = text;
+  });
+
+  return errorMessage;
+};
+
 module.exports = {
   getRandomInt,
   shuffle,
   checkNumParam,
   getCategoryOffer,
   getPictureFileName,
-  readContent
+  readContent,
+  getErrorMessage
 };
