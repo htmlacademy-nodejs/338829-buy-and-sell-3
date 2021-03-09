@@ -30,6 +30,8 @@ const createApi = (baseURL, timeout = API_TIMEOUT) => {
     searchOffers: (query) => fetch(`/search`, {params: {query}}),
     createOffer: (offer) => fetch(`/offers`, {method: `POST`, data: offer}),
     updateOffer: (id, offer) => fetch(`/offers/${id}`, {method: `PUT`, data: offer}),
+    createComment: (id, comment) => fetch(`/offers/${id}/comments`, {method: `POST`, data: comment}),
+    deleteComment: (id, commentId) => fetch(`/offers/${id}/comments/${commentId}`, {method: `DELETE`}),
   };
 };
 

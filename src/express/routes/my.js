@@ -1,8 +1,11 @@
 'use strict';
 
+const express = require(`express`);
 const {axiosApi} = require(`../axios-api/axios-api`);
-const {Router} = require(`express`);
-const myRouter = new Router();
+const {getErrorMessage} = require(`../../utils`);
+
+const myRouter = new express.Router();
+myRouter.use(express.urlencoded());
 
 myRouter.get(`/`, async (req, res) => {
   const response = await axiosApi.getOffers();
@@ -23,6 +26,24 @@ myRouter.get(`/comments`, async (req, res) => {
   }));
 
   res.render(`pages/comments`, {tickets: data});
+});
+
+myRouter.post(`/comments`, async (req, res) => {
+  const {text, offerId} = req.body;
+  const offer = await axiosApi.getOffer({id: offerId, comments: true});
+
+  try {
+    await axiosApi.createComment(offerId, {text});
+    res.render(`pages/ticket`, {
+      ticket: offer,
+      message: {}
+    });
+  } catch (err) {
+    res.render(`pages/ticket`, {
+      ticket: offer,
+      message: getErrorMessage(err.response.data.message)
+    });
+  }
 });
 
 module.exports = myRouter;

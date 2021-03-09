@@ -127,7 +127,10 @@ offersRouter.get(`/:id`, async (req, res) => {
     const {id} = req.params;
     const offer = await axiosApi.getOffer({id, comments: true});
 
-    res.render(`pages/ticket`, {ticket: offer});
+    res.render(`pages/ticket`, {
+      ticket: offer,
+      message: {}
+    });
   } catch (error) {
     res
       .status(HttpCode.NOT_FOUND)
