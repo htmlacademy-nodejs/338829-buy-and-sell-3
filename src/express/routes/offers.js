@@ -1,13 +1,14 @@
 'use strict';
 
-const {Router} = require(`express`);
+const express = require(`express`);
 const {pictureUpload} = require(`../middlewares`);
 const {axiosApi} = require(`../axios-api/axios-api`);
 const {HttpCode} = require(`../../constants`);
 const {getCategoryOffer, getErrorMessage} = require(`../../utils`);
 const {OFFERS_PER_PAGE} = require(`../../constants`);
 
-const offersRouter = new Router();
+const offersRouter = new express.Router();
+offersRouter.use(express.urlencoded());
 
 offersRouter.get(`/category/:id`, async (req, res) => {
   const {id} = req.params;
@@ -136,6 +137,26 @@ offersRouter.get(`/:id`, async (req, res) => {
       .status(HttpCode.NOT_FOUND)
       .render(`errors/404`);
   }
+});
+
+offersRouter.post(`/:id`, async (req, res) => {
+  const {id} = req.params;
+  const {text} = req.body;
+
+  let message;
+
+  try {
+    await axiosApi.createComment(id, {text});
+    message = {};
+  } catch (err) {
+    message = getErrorMessage(err.response.data.message);
+  }
+
+  const offer = await axiosApi.getOffer({id, comments: true});
+  res.render(`pages/ticket`, {
+    ticket: offer,
+    message
+  });
 });
 
 module.exports = offersRouter;

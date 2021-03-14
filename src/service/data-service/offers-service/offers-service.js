@@ -27,6 +27,13 @@ class OffersService {
     const [updatedRows] = await this._Offer.update(offer, {
       where: {id}
     });
+
+    await this._OfferCategory.destroy({
+      where: {OfferId: id}
+    });
+
+    const updateOffer = await this._Offer.findByPk(id);
+    await updateOffer.addCategories([...offer.categories]);
     return Boolean(updatedRows);
   }
 
