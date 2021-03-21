@@ -3,6 +3,8 @@
 const {Router} = require(`express`);
 const {HttpCode} = require(`../../../constants`);
 const {
+  idOfferValidator,
+  idCommentValidator,
   offerValidator,
   commentValidator,
   commentExist,
@@ -46,14 +48,14 @@ module.exports = (app, offersService, commentsService) => {
       });
   });
 
-  route.get(`/:offerId`, offerExist(offersService), (req, res) => {
+  route.get(`/:offerId`, [idOfferValidator, offerExist(offersService)], (req, res) => {
     const {offer} = res.locals;
     return res
       .status(HttpCode.OK)
       .json(offer);
   });
 
-  route.put(`/:offerId`, [offerExist(offersService), offerValidator], async (req, res) => {
+  route.put(`/:offerId`, [idOfferValidator, offerExist(offersService), offerValidator], async (req, res) => {
     const {offerId} = req.params;
     const updated = await offersService.update(offerId, req.body);
     return res
@@ -64,7 +66,7 @@ module.exports = (app, offersService, commentsService) => {
       });
   });
 
-  route.delete(`/:offerId`, offerExist(offersService), async (req, res) => {
+  route.delete(`/:offerId`, [idOfferValidator, offerExist(offersService)], async (req, res) => {
     const {offerId} = req.params;
     const deleted = await offersService.delete(offerId);
     return res
@@ -72,10 +74,9 @@ module.exports = (app, offersService, commentsService) => {
       .send(deleted);
   });
 
-  route.post(`/:offerId/comments`, [offerExist(offersService), commentValidator], async (req, res) => {
+  route.post(`/:offerId/comments`, [idOfferValidator, offerExist(offersService), commentValidator], async (req, res) => {
     const {offerId} = req.params;
     const comment = await commentsService.create(offerId, req.body);
-
     return res
       .status(HttpCode.CREATED)
       .json({
@@ -84,7 +85,7 @@ module.exports = (app, offersService, commentsService) => {
       });
   });
 
-  route.get(`/:offerId/comments`, offerExist(offersService), async (req, res) => {
+  route.get(`/:offerId/comments`, [idOfferValidator, offerExist(offersService)], async (req, res) => {
     const {offerId} = req.params;
     const comments = await commentsService.findAll(offerId);
     return res
@@ -92,11 +93,13 @@ module.exports = (app, offersService, commentsService) => {
       .json(comments);
   });
 
-  route.delete(`/:offerId/comments/:commentId`, [offerExist(offersService), commentExist(commentsService)], async (req, res) => {
-    const {commentId} = req.params;
-    await commentsService.delete(commentId);
-    return res
-      .status(HttpCode.NO_CONTENT)
-      .send(``);
-  });
+  route.delete(`/:offerId/comments/:commentId`,
+      [idOfferValidator, offerExist(offersService), idCommentValidator, commentExist(commentsService)],
+      async (req, res) => {
+        const {commentId} = req.params;
+        await commentsService.delete(commentId);
+        return res
+          .status(HttpCode.NO_CONTENT)
+          .send(``);
+      });
 };

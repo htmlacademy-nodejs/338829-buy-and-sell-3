@@ -8,7 +8,7 @@ const {getCategoryOffer, getErrorMessage} = require(`../../utils`);
 const {OFFERS_PER_PAGE} = require(`../../constants`);
 
 const offersRouter = new express.Router();
-offersRouter.use(express.urlencoded());
+offersRouter.use(express.urlencoded({extended: true}));
 
 offersRouter.get(`/category/:id`, async (req, res) => {
   const {id} = req.params;

@@ -5,12 +5,14 @@ const defineCategory = require(`./category/category`);
 const defineComment = require(`./comment/comment`);
 const defineOffer = require(`./offer/offer`);
 const defineOfferCategory = require(`./offer-category/offer-category`);
+const defineUser = require(`./user/user`);
 
 module.exports = (sequelize) => {
   const Category = defineCategory(sequelize);
   const Comment = defineComment(sequelize);
   const Offer = defineOffer(sequelize);
   const OfferCategory = defineOfferCategory(sequelize);
+  const User = defineUser(sequelize);
 
   // один ко многим
   // связка оффер -> коммент
@@ -27,6 +29,7 @@ module.exports = (sequelize) => {
     Category,
     Comment,
     Offer,
-    OfferCategory
+    OfferCategory,
+    User
   };
 };

@@ -196,7 +196,7 @@ describe(`UPDATE: API offer`, () => {
       "description": `Без дверей, Мой дед не мог её сломать. Любые проверки на месте`,
       "type": `sale`,
       "sum": 101,
-      "categories": [`Гараж`]
+      "categories": [`1`]
     };
   });
 
