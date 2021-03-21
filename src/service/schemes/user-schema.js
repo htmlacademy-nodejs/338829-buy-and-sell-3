@@ -2,24 +2,43 @@
 'use strict';
 
 const Joi = require(`joi`);
+const {RegisterMessage} = require(`../../../../node-scripts/auth/constants`);
 
 module.exports = Joi.object({
   email: Joi
     .string()
     .email({tlds: false})
-    .required(),
+    .required()
+    .messages({
+      'string.email': `\"email\" ${RegisterMessage.WRONG_EMAIL}`,
+      'any.required': `\"email\" ${RegisterMessage.REQUIRED_FIELD}`
+    }),
   name: Joi
     .string()
-    .required(),
+    .required()
+    .messages({
+      'any.required': `\"name\" ${RegisterMessage.REQUIRED_FIELD}`
+    }),
   password: Joi
     .string()
     .min(6)
+    .max(12)
     .pattern(new RegExp(`^[a-zA-Z0-9]{3,30}$`))
-    .required(),
+    .required()
+    .messages({
+      'string.min': `\"password\" ${RegisterMessage.MIN_PASSWORD_LENGTH}`,
+      'string.max': `\"password\" ${RegisterMessage.MAX_PASSWORD_LENGTH}`,
+      'any.required': `\"password\" ${RegisterMessage.REQUIRED_FIELD}`,
+      'string.pattern': `\"password\" ${RegisterMessage.BAD_PASSWORD}`
+    }),
   confirm_password: Joi
     .string()
+    .required()
     .valid(Joi.ref(`password`))
-    .required(),
+    .messages({
+      'any.only': `\"confirm_password\" ${RegisterMessage.PASSWORDS_NOT_EQUALS}`,
+      'any.required': `\"confirm_password\" ${RegisterMessage.REQUIRED_FIELD}`
+    }),
   avatar: Joi
-    .string()
+    .string().allow(null, ``)
 });

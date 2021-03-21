@@ -1,5 +1,6 @@
 'use strict';
 
+const {RegisterMessage} = require(`../../../../../node-scripts/auth/constants`);
 const {HttpCode} = require(`../../../constants`);
 
 module.exports = (usersService) => async (req, res, next) => {
@@ -10,7 +11,7 @@ module.exports = (usersService) => async (req, res, next) => {
       return res
         .status(HttpCode.BAD_REQUEST)
         .json({
-          message: `User is exist`,
+          message: [`\"exist\" ${RegisterMessage.USER_ALREADY_REGISTER}`],
           data: {}
         });
     }
