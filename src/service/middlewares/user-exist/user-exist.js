@@ -1,7 +1,6 @@
 'use strict';
 
-const {RegisterMessage} = require(`../../../../../node-scripts/auth/constants`);
-const {HttpCode} = require(`../../../constants`);
+const {RegisterMessage, HttpCode} = require(`../../../constants`);
 
 module.exports = (usersService) => async (req, res, next) => {
   const {body} = req;
