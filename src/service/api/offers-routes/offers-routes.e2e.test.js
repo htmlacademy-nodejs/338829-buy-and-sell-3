@@ -112,8 +112,11 @@ describe(`READ: API offer`, () => {
       expect(response.statusCode).toBe(HttpCode.BAD_REQUEST);
     });
 
-    test(`Response text to equal "\"id\" must be a number"`, () => {
-      expect(response.text).toBe(`\"id\" must be a number`);
+    test(`Response error to equal`, () => {
+      expect(response.body).toStrictEqual({
+        "data": {"offerId": `NOEXST`},
+        "message": [`"offerId" must be a number`]
+      });
     });
   });
 
@@ -311,8 +314,11 @@ describe(`READ: API comments`, () => {
       expect(response.statusCode).toBe(HttpCode.BAD_REQUEST);
     });
 
-    test(`Response text to equal "\"id\" must be a number"`, () => {
-      expect(response.text).toBe(`\"id\" must be a number`);
+    test(`Response error to equal`, () => {
+      expect(response.body).toStrictEqual({
+        "data": {"offerId": `NOEXST`},
+        "message": [`"offerId" must be a number`]
+      });
     });
   });
 
@@ -433,6 +439,14 @@ describe(`DELETE: API comments`, () => {
     test(`Status code 400 with non-existent comment`, async () => {
       const notfoundResponse = await request(app).delete(`/offers/${offerId}/comments/NOEXST`);
       expect(notfoundResponse.statusCode).toBe(HttpCode.BAD_REQUEST);
+    });
+
+    test(`Response error to equal`, async () => {
+      const notfoundResponse = await request(app).delete(`/offers/${offerId}/comments/NOEXST`);
+      expect(notfoundResponse.body).toStrictEqual({
+        "data": {"commentId": `NOEXST`, "offerId": `1`},
+        "message": [`"commentId" must be a number`]
+      });
     });
   });
 

@@ -18,7 +18,7 @@ module.exports = (usersService) => async (req, res, next) => {
     return res
       .status(HttpCode.BAD_REQUEST)
       .json({
-        message: `Что-то пошло не так`,
+        message: [`Что-то пошло не так`],
         data: {}
       });
   }

@@ -90,6 +90,7 @@ const RegisterMessage = {
   WRONG_EMAIL: `Неправильный email`,
   REQUIRED_FIELD: `Поле обязательно для заполнения`,
   MIN_PASSWORD_LENGTH: `Пароль должен быть не меньше 6 символов`,
+  MAX_PASSWORD_LENGTH: `Пароль должен быть не больше 12 символов`,
   PASSWORDS_NOT_EQUALS: `Пароли не совпадают`,
   EMPTY_VALUE: `Не указано значение`,
 };

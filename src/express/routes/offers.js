@@ -143,20 +143,18 @@ offersRouter.post(`/:id`, async (req, res) => {
   const {id} = req.params;
   const {text} = req.body;
 
-  let message;
-
   try {
     await axiosApi.createComment(id, {text});
-    message = {};
+    res.redirect(`/offers/${id}`);
   } catch (err) {
-    message = getErrorMessage(err.response.data.message);
-  }
+    const message = getErrorMessage(err.response.data.message);
+    const offer = await axiosApi.getOffer({id, comments: true});
 
-  const offer = await axiosApi.getOffer({id, comments: true});
-  res.render(`pages/ticket`, {
-    ticket: offer,
-    message
-  });
+    res.render(`pages/ticket`, {
+      ticket: offer,
+      message
+    });
+  }
 });
 
 module.exports = offersRouter;

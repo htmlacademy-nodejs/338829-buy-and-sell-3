@@ -58,7 +58,7 @@ rootRouter.post(`/register`, pictureUpload.single(`avatar`), async (req, res) =>
 
   try {
     await axiosApi.createUser(newUser);
-    res.render(`pages/login`);
+    res.redirect(`/login`);
   } catch (err) {
     res.render(`pages/sign-up`, {
       newUser: {
