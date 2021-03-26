@@ -50,16 +50,20 @@ const readContent = async (filePath) => {
 };
 
 const getErrorMessage = (messages = []) => {
-  const errorMessage = {};
+  try {
+    const errorMessage = {};
+    messages.forEach((message) => {
+      const regExp = new RegExp(/"(.*?)"/gi);
+      const [, key] = regExp.exec(message);
+      const text = message.replace(regExp, ``).trim();
+      errorMessage[key] = text;
+    });
 
-  messages.forEach((message) => {
-    const regExp = new RegExp(/"(.*?)"/gi);
-    const [, key] = regExp.exec(message);
-    const text = message.replace(regExp, ``).trim();
-    errorMessage[key] = text;
-  });
-
-  return errorMessage;
+    return errorMessage;
+  } catch (error) {
+    console.info(chalk.red(error));
+    return {};
+  }
 };
 
 module.exports = {

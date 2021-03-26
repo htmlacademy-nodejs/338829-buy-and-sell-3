@@ -10,7 +10,7 @@ module.exports = (usersService) => async (req, res, next) => {
       return res
         .status(HttpCode.BAD_REQUEST)
         .json({
-          message: [`\"exist\" ${RegisterMessage.USER_ALREADY_REGISTER}`],
+          message: [`"exist" ${RegisterMessage.USER_ALREADY_REGISTER}`],
           data: {}
         });
     }
@@ -18,7 +18,7 @@ module.exports = (usersService) => async (req, res, next) => {
     return res
       .status(HttpCode.BAD_REQUEST)
       .json({
-        message: [`Что-то пошло не так`],
+        message: [`"fatal" Что-то пошло не так`],
         data: {}
       });
   }
