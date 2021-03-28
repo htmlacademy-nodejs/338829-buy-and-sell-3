@@ -1,7 +1,6 @@
 'use strict';
 const bcrypt = require(`bcrypt`);
-
-const saltRounds = 10;
+const {BCRYPT_SALT_ROUNDS} = require(`../../../constants`);
 
 class UsersService {
   constructor(sequelize) {
@@ -10,7 +9,7 @@ class UsersService {
 
   async create(newUser) {
     const {password} = newUser;
-    const pwHash = await bcrypt.hash(password, saltRounds);
+    const pwHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
     const user = await this._User.create({...newUser, password: pwHash});
     return user.get();

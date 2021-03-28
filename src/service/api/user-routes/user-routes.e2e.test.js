@@ -6,7 +6,7 @@ const Sequelize = require(`sequelize`);
 
 const initDB = require(`../../lib/init-db`);
 const userRoutes = require(`../user-routes/user-routes`);
-const {UsersService} = require(`../../data-service`);
+const {UsersService, TokenService} = require(`../../data-service`);
 
 const mockCategories = [
   `Животные`,
@@ -44,21 +44,33 @@ const mockOffers = [
   }
 ];
 
+const mockUsers = [{
+  "email": `admin@local.localhost`,
+  "name": `Admin`,
+  "password": `222222`,
+  "confirm_password": `222222`
+}];
+
 const {HttpCode} = require(`../../../constants`);
 
-const app = express();
-app.use(express.json());
+const createApp = async () => {
+  const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
+  await initDB(mockDB, {categories: mockCategories, offers: mockOffers, users: mockUsers});
 
-const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
+  const app = express();
+  app.use(express.json());
+  userRoutes(app, new UsersService(mockDB), new TokenService(mockDB));
 
-describe(`CREATE: API user`, () => {
+  return app;
+};
+
+describe(`AUTH: User registration`, () => {
+  let app;
   let response;
   let newUser;
 
   beforeAll(async () => {
-    await initDB(mockDB, {categories: mockCategories, offers: mockOffers});
-    userRoutes(app, new UsersService(mockDB));
-
+    app = await createApp();
     newUser = {
       "name": `User Test`,
       "password": `111111`,
@@ -93,6 +105,245 @@ describe(`CREATE: API user`, () => {
 
         expect(badResponse.statusCode).toBe(HttpCode.BAD_REQUEST);
       }
+    });
+  });
+});
+
+describe(`AUTH: User login`, () => {
+  let app;
+  let loginResponse;
+  let user;
+
+  beforeAll(async () => {
+    app = await createApp();
+    user = {
+      "email": `admin@local.localhost`,
+      "password": `222222`,
+    };
+  });
+
+  describe(`Correctly`, () => {
+    beforeAll(async () => {
+      loginResponse = await request(app)
+        .post(`/user/login`)
+        .send(user);
+    });
+
+    test(`Status code 200`, () => {
+      expect(loginResponse.statusCode).toBe(HttpCode.OK);
+    });
+
+    test(`Response body to have accessToken & refreshToken`, () => {
+      expect(loginResponse.body).toHaveProperty(`accessToken`);
+      expect(loginResponse.body).toHaveProperty(`refreshToken`);
+    });
+  });
+
+  describe(`Incorrectly`, () => {
+    const badUser = {...user};
+
+    test(`Status code 400`, async () => {
+      for (const key of Object.keys(user)) {
+        delete badUser[key];
+
+        const badResponse = await request(app)
+          .post(`/user/login`)
+          .send(badUser);
+
+        expect(badResponse.statusCode).toBe(HttpCode.BAD_REQUEST);
+      }
+    });
+  });
+
+  describe(`Incorrectly - email`, () => {
+    let badUser;
+    let badResponse;
+
+    beforeEach(async () => {
+      badUser = {...user};
+      badUser.email = `user2@local.localhost`;
+
+      badResponse = await request(app)
+        .post(`/user/login`)
+        .send(badUser);
+    });
+
+    test(`Status code 403`, async () => {
+      expect(badResponse.statusCode).toBe(HttpCode.FORBIDDEN);
+    });
+
+    test(`Response body to equal`, async () => {
+      expect(badResponse.body).toEqual({"message": `Пользователь с таким email не зарегистрирован`});
+    });
+  });
+
+  describe(`Incorrectly - password`, () => {
+    let badUser;
+    let badResponse;
+
+    beforeEach(async () => {
+      badUser = {...user};
+      badUser.password = `654321`;
+
+      badResponse = await request(app)
+        .post(`/user/login`)
+        .send(badUser);
+    });
+
+    test(`Status code 403`, async () => {
+      expect(badResponse.statusCode).toBe(HttpCode.FORBIDDEN);
+    });
+
+    test(`Response body to equal`, async () => {
+      expect(badResponse.body).toEqual({"message": `Неправильно введён логин или пароль`});
+    });
+  });
+});
+
+describe(`AUTH: User refresh token`, () => {
+  let app;
+  let response;
+  let user;
+
+  beforeAll(async () => {
+    app = await createApp();
+    user = {
+      "email": `admin@local.localhost`,
+      "password": `222222`,
+    };
+  });
+
+  describe(`Correctly`, () => {
+    let refreshResponse;
+
+    beforeAll(async () => {
+      response = await request(app)
+        .post(`/user/login`)
+        .send(user);
+
+      refreshResponse = await request(app)
+        .post(`/user/refresh`)
+        .send({token: response.body.refreshToken});
+    });
+
+    test(`Status code 200`, () => {
+      expect(refreshResponse.statusCode).toBe(HttpCode.OK);
+    });
+
+    test(`Response body to have accessToken & refreshToken`, () => {
+      expect(refreshResponse.body).toHaveProperty(`accessToken`);
+      expect(refreshResponse.body).toHaveProperty(`refreshToken`);
+    });
+  });
+
+  describe(`Incorrectly, bad response`, () => {
+    let refreshResponse;
+
+    test(`Status code 400`, async () => {
+      refreshResponse = await request(app)
+        .post(`/user/refresh`)
+        .send();
+
+      expect(refreshResponse.statusCode).toBe(HttpCode.BAD_REQUEST);
+    });
+  });
+
+  describe(`Incorrectly, not found token`, () => {
+    let refreshResponse;
+
+    test(`Status code 404`, async () => {
+      refreshResponse = await request(app)
+        .post(`/user/refresh`)
+        .send({token: `123`});
+
+      expect(refreshResponse.statusCode).toBe(HttpCode.NOT_FOUND);
+    });
+  });
+});
+
+describe(`AUTH: User logout`, () => {
+  let app;
+  let user;
+  let loginResponse;
+
+  beforeAll(async () => {
+    app = await createApp();
+    user = {
+      "email": `admin@local.localhost`,
+      "password": `222222`,
+    };
+
+    loginResponse = await request(app)
+      .post(`/user/login`)
+      .send(user);
+  });
+
+  describe(`Correctly`, () => {
+    let logoutResponse;
+
+    beforeAll(async () => {
+      logoutResponse = await request(app)
+        .delete(`/user/logout`)
+        .set(`authorization`, `Bearer ${loginResponse.body.accessToken}`)
+        .send({token: loginResponse.body.refreshToken});
+    });
+
+    test(`Status code 204`, () => {
+      expect(logoutResponse.statusCode).toBe(HttpCode.NO_CONTENT);
+    });
+  });
+
+  describe(`Incorrectly`, () => {
+    test(`Without headers, status code 401`, async () => {
+      const logoutResponse = await request(app)
+        .delete(`/user/logout`)
+        .send({token: loginResponse.body.refreshToken});
+
+      expect(logoutResponse.statusCode).toBe(HttpCode.UNAUTHORIZED);
+    });
+
+    test(`Without token, Status code 401`, async () => {
+      const logoutResponse = await request(app)
+        .delete(`/user/logout`)
+        .set(`authorization`, ``)
+        .send({token: loginResponse.body.refreshToken});
+
+      expect(logoutResponse.statusCode).toBe(HttpCode.UNAUTHORIZED);
+    });
+
+    test(`Incorrect accessToken, Status code 403`, async () => {
+      const logoutResponse = await request(app)
+        .delete(`/user/logout`)
+        .set(`authorization`, `Bearer 123`)
+        .send({token: loginResponse.body.refreshToken});
+
+      expect(logoutResponse.statusCode).toBe(HttpCode.FORBIDDEN);
+    });
+
+    test(`Without body, Status code 400`, async () => {
+      const logoutResponse = await request(app)
+        .delete(`/user/logout`)
+        .set(`authorization`, `Bearer ${loginResponse.body.accessToken}`);
+
+      expect(logoutResponse.statusCode).toBe(HttpCode.BAD_REQUEST);
+    });
+
+    test(`With empty body, Status code 400`, async () => {
+      const logoutResponse = await request(app)
+        .delete(`/user/logout`)
+        .set(`authorization`, `Bearer ${loginResponse.body.accessToken}`)
+        .send({});
+
+      expect(logoutResponse.statusCode).toBe(HttpCode.BAD_REQUEST);
+    });
+
+    test(`Incorrect refreshToken, Status code 404`, async () => {
+      const logoutResponse = await request(app)
+        .delete(`/user/logout`)
+        .set(`authorization`, `Bearer ${loginResponse.body.accessToken}`)
+        .send({token: `123`});
+
+      expect(logoutResponse.statusCode).toBe(HttpCode.NOT_FOUND);
     });
   });
 });

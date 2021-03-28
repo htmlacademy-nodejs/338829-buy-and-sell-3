@@ -39,7 +39,6 @@ module.exports = (app, usersService, tokenService) => {
       const {accessToken, refreshToken} = jwtHelper({id: user.id});
 
       await tokenService.add(refreshToken);
-
       return res
         .status(HttpCode.OK)
         .json({accessToken, refreshToken});
