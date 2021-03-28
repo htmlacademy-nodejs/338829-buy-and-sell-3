@@ -6,6 +6,7 @@ const defineComment = require(`./comment/comment`);
 const defineOffer = require(`./offer/offer`);
 const defineOfferCategory = require(`./offer-category/offer-category`);
 const defineUser = require(`./user/user`);
+const defineToken = require(`./token/token`);
 
 module.exports = (sequelize) => {
   const Category = defineCategory(sequelize);
@@ -13,6 +14,7 @@ module.exports = (sequelize) => {
   const Offer = defineOffer(sequelize);
   const OfferCategory = defineOfferCategory(sequelize);
   const User = defineUser(sequelize);
+  const Token = defineToken(sequelize);
 
   // один ко многим
   // связка оффер -> коммент
@@ -30,6 +32,7 @@ module.exports = (sequelize) => {
     Comment,
     Offer,
     OfferCategory,
-    User
+    User,
+    Token
   };
 };

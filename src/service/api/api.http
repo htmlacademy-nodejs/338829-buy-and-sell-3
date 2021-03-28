@@ -54,3 +54,37 @@ content-type: application/json
     "text": "test comment 123231 "
 }
 ###
+POST http://localhost:3000/api/user
+content-type: application/json
+
+{
+    "email": "user@local.localhost",
+    "name": "User Name",
+    "password": "111111",
+    "confirm_password": "111111"
+}
+###
+POST http://localhost:3000/api/user/login
+content-type: application/json
+
+{
+    "email": "user@local.localhost",
+    "password": "111111"
+}
+
+###
+POST http://localhost:3000/api/user/refresh
+content-type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjE2OTI3NTkyfQ.QWkmp-BNEpxEIkmaexCMY2cfAiL_5vt2hfSzJyC-UpU"
+}
+
+###
+DELETE http://localhost:3000/api/user/logout
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjE2OTI3NTkyLCJleHAiOjE2MTY5Mjc4OTJ9.3Tkg8HDSkh-N8Vxxtv7jee9Hk1dqgKH-fAwTXUoGS5Q
+content-type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjE2OTI3NTkyfQ.QWkmp-BNEpxEIkmaexCMY2cfAiL_5vt2hfSzJyC-UpU"
+}

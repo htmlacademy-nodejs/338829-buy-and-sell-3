@@ -25,6 +25,9 @@ const API_TIMEOUT = 1000;
 
 const OFFERS_PER_PAGE = 8;
 
+const JWT_ACCESS_SECRET = `nesecretjwt`;
+const JWT_REFRESH_SECRET = `nesecretrefreshjwt`;
+
 const OfferType = {
   OFFER: `offer`,
   SALE: `sale`,
@@ -95,6 +98,13 @@ const RegisterMessage = {
   EMPTY_VALUE: `Не указано значение`,
 };
 
+const LoginMessage = {
+  USER_NOT_EXISTS: `Пользователь с таким email не зарегистрирован`,
+  WRONG_PASSWORD: `Неправильно введён логин или пароль`,
+  WRONG_EMAIL: `Неправильный email`,
+  REQUIRED_FIELD: `Поле обязательно для заполнения`,
+};
+
 const DEFAULT_CLI_COMMAND = CliCommand.HELP;
 
 module.exports = {
@@ -119,6 +129,8 @@ module.exports = {
   API_TIMEOUT,
   FILE_API_LOG_PATH,
   OFFERS_PER_PAGE,
+  JWT_ACCESS_SECRET,
+  JWT_REFRESH_SECRET,
   OfferType,
   SumRestrict,
   PictureRestrict,
@@ -129,5 +141,6 @@ module.exports = {
   HttpCode,
   LogLevel,
   NodeEnv,
-  RegisterMessage
+  RegisterMessage,
+  LoginMessage
 };

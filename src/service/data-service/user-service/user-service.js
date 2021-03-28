@@ -23,6 +23,11 @@ class UsersService {
 
     return user;
   }
+
+  async checkUser(user, password) {
+    const match = await bcrypt.compare(password, user.password);
+    return match;
+  }
 }
 
 module.exports = UsersService;

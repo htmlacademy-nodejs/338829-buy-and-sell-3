@@ -14,7 +14,8 @@ const {
   OffersService,
   CommentsService,
   SearchService,
-  UsersService
+  UsersService,
+  TokenService
 } = require(`../data-service`);
 
 const routes = new Router();
@@ -26,7 +27,7 @@ const routes = new Router();
   categoryRoute(routes, new CategoryService(sequelize));
   offersRoute(routes, new OffersService(sequelize), new CommentsService(sequelize));
   searchRoute(routes, new SearchService(sequelize));
-  userRoute(routes, new UsersService(sequelize));
+  userRoute(routes, new UsersService(sequelize), new TokenService(sequelize));
 })();
 
 module.exports = routes;
