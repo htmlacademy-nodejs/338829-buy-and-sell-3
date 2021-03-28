@@ -5,6 +5,7 @@ const {HttpCode} = require(`../../../constants`);
 module.exports = (key, scheme) => async (req, res, next) => {
   try {
     await scheme.validateAsync(req[key], {abortEarly: false});
+    return next();
   } catch (error) {
     const {details = []} = error;
 
@@ -15,6 +16,4 @@ module.exports = (key, scheme) => async (req, res, next) => {
         data: req[key]
       });
   }
-
-  return next();
 };

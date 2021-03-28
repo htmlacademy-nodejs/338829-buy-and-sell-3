@@ -7,12 +7,16 @@ module.exports = (app, service) => {
   const route = new Router();
   app.use(`/categories`, route);
 
-  route.get(`/`, async (req, res) => {
-    const hasCount = Boolean(req.query.count);
-    const categories = await service.findAll(hasCount);
+  route.get(`/`, async (req, res, next) => {
+    try {
+      const hasCount = Boolean(req.query.count);
+      const categories = await service.findAll(hasCount);
 
-    return res
-      .status(HttpCode.OK)
-      .json(categories);
+      return res
+        .status(HttpCode.OK)
+        .json(categories);
+    } catch (error) {
+      return next(error);
+    }
   });
 };
