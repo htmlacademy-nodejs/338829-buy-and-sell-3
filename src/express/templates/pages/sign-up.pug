@@ -23,8 +23,8 @@ block content
         .form__field.sign-up__field
           input#user-email.js-field(type='email' name='email' value=newUser.email required)
           label(for='user-email') Эл. почта
-          +errorFormEl(message.email)
           span Обязательное поле
+          +errorFormEl(message.email)
         .form__field.sign-up__field
           input#user-password.js-field(type='password' name='password' required)
           label(for='user-password') Пароль
@@ -35,5 +35,5 @@ block content
           label(for='user-password-again') Пароль еще раз
           span Обязательное поле
           +errorFormEl(message.confirm_password)
+          +errorFormEl(message.exist)
         button.sign-up__button.btn.btn--medium.js-button(type='submit' disabled) Создать аккаунт
-        +errorFormEl(message.exist)

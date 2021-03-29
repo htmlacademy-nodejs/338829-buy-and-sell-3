@@ -21,6 +21,10 @@ const createApi = (baseURL, timeout = API_TIMEOUT) => {
     return response.data;
   };
 
+  const getAuthHeaders = (accessToken) => {
+    return {'authorization': `Bearer ${accessToken}`};
+  };
+
   return {
     api,
     getOffers: ({offset, limit, comments = false, catId = -1} = {}) => fetch(`/offers`, {params: {offset, limit, comments, catId}}),
@@ -32,7 +36,14 @@ const createApi = (baseURL, timeout = API_TIMEOUT) => {
     updateOffer: (id, offer) => fetch(`/offers/${id}`, {method: `PUT`, data: offer}),
     createComment: (id, comment) => fetch(`/offers/${id}/comments`, {method: `POST`, data: comment}),
     deleteComment: (id, commentId) => fetch(`/offers/${id}/comments/${commentId}`, {method: `DELETE`}),
-    createUser: (user) => fetch(`/user`, {method: `POST`, data: user})
+    createUser: (user) => fetch(`/user`, {method: `POST`, data: user}),
+    loginUser: (auth) => fetch(`/user/login`, {method: `POST`, data: auth}),
+    logoutUser: (accessToken, refreshToken) => {
+      return fetch(`/user/logout`, {method: `DELETE`, data: {token: refreshToken}, headers: getAuthHeaders(accessToken)});
+    },
+    refreshUser: (refreshToken) => {
+      return fetch(`/user/refresh`, {method: `POST`, data: {token: refreshToken}});
+    }
   };
 };
 

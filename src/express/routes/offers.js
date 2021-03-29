@@ -10,39 +10,47 @@ const {OFFERS_PER_PAGE} = require(`../../constants`);
 const offersRouter = new express.Router();
 offersRouter.use(express.urlencoded({extended: true}));
 
-offersRouter.get(`/category/:id`, async (req, res) => {
-  const {id} = req.params;
-  const {page = 1} = req.query;
+offersRouter.get(`/category/:id`, async (req, res, next) => {
+  try {
+    const {id} = req.params;
+    const {page = 1} = req.query;
 
-  const limit = OFFERS_PER_PAGE;
-  const offset = (Number(page) - 1) * limit;
+    const limit = OFFERS_PER_PAGE;
+    const offset = (Number(page) - 1) * limit;
 
-  const [{count, offers}, categories] = await Promise.all([
-    axiosApi.getOffers({limit, offset, catId: id}),
-    axiosApi.getCategories({count: true})
-  ]);
+    const [{count, offers}, categories] = await Promise.all([
+      axiosApi.getOffers({limit, offset, catId: id}),
+      axiosApi.getCategories({count: true})
+    ]);
 
-  const total = Math.ceil(count / OFFERS_PER_PAGE);
+    const total = Math.ceil(count / OFFERS_PER_PAGE);
 
-  res.render(`pages/category`, {
-    tickets: offers,
-    categories,
-    id,
-    page: Number(page),
-    totalPages: total
-  });
+    return res.render(`pages/category`, {
+      tickets: offers,
+      categories,
+      id,
+      page: Number(page),
+      totalPages: total
+    });
+  } catch (error) {
+    return next(error);
+  }
 });
 
-offersRouter.get(`/add`, async (req, res) => {
-  const categories = await axiosApi.getCategories();
-  res.render(`pages/new-ticket`, {
-    categories,
-    newOffer: {
-      categories: [],
-      picture: `blank.png`
-    },
-    message: {}
-  });
+offersRouter.get(`/add`, async (req, res, next) => {
+  try {
+    const categories = await axiosApi.getCategories();
+    return res.render(`pages/new-ticket`, {
+      categories,
+      newOffer: {
+        categories: [],
+        picture: `blank.png`
+      },
+      message: {}
+    });
+  } catch (error) {
+    return next(error);
+  }
 });
 
 offersRouter.post(`/add`, pictureUpload.single(`picture`), async (req, res) => {
@@ -59,10 +67,10 @@ offersRouter.post(`/add`, pictureUpload.single(`picture`), async (req, res) => {
 
   try {
     await axiosApi.createOffer(newOffer);
-    res.redirect(`/my`);
+    return res.redirect(`/my`);
   } catch (err) {
     const categories = await axiosApi.getCategories();
-    res.render(`pages/new-ticket`, {
+    return res.render(`pages/new-ticket`, {
       categories,
       newOffer,
       message: getErrorMessage(err.response.data.message)
@@ -83,14 +91,14 @@ offersRouter.get(`/edit/:id`, async (req, res) => {
       categories: offer.categories.map((cat) => String(cat.id))
     };
 
-    res.render(`pages/ticket-edit`, {
+    return res.render(`pages/ticket-edit`, {
       offerId: id,
       ticket: editOffer,
       categories,
       message: {}
     });
   } catch (error) {
-    res
+    return res
       .status(HttpCode.NOT_FOUND)
       .render(`errors/404`);
   }
@@ -111,10 +119,10 @@ offersRouter.post(`/edit/:id`, pictureUpload.single(`picture`), async (req, res)
 
   try {
     await axiosApi.updateOffer(Number(id), editOffer);
-    res.redirect(`/my`);
+    return res.redirect(`/my`);
   } catch (err) {
     const categories = await axiosApi.getCategories();
-    res.render(`pages/ticket-edit`, {
+    return res.render(`pages/ticket-edit`, {
       offerId: id,
       ticket: editOffer,
       categories,
@@ -128,12 +136,12 @@ offersRouter.get(`/:id`, async (req, res) => {
     const {id} = req.params;
     const offer = await axiosApi.getOffer({id, comments: true});
 
-    res.render(`pages/ticket`, {
+    return res.render(`pages/ticket`, {
       ticket: offer,
       message: {}
     });
   } catch (error) {
-    res
+    return res
       .status(HttpCode.NOT_FOUND)
       .render(`errors/404`);
   }
@@ -141,16 +149,16 @@ offersRouter.get(`/:id`, async (req, res) => {
 
 offersRouter.post(`/:id`, async (req, res) => {
   const {id} = req.params;
-  const {text} = req.body;
-
   try {
+    const {text} = req.body;
     await axiosApi.createComment(id, {text});
-    res.redirect(`/offers/${id}`);
+
+    return res.redirect(`/offers/${id}`);
   } catch (err) {
     const message = getErrorMessage(err.response.data.message);
     const offer = await axiosApi.getOffer({id, comments: true});
 
-    res.render(`pages/ticket`, {
+    return res.render(`pages/ticket`, {
       ticket: offer,
       message
     });
