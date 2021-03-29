@@ -1,4 +1,9 @@
-header.header
+-
+  function getLoggedClassName() {
+    return isAuth ? `header header--logged` : `header`;
+  }
+
+header(class=getLoggedClassName())
   .header__wrapper
     a.header__logo.logo(href='/')
       img(src='/img/logo.svg' width='179' height='34' alt='Логотип Куплю Продам')
@@ -7,11 +12,11 @@ header.header
         li.header__item
           a(href='/my') Публикации
         li.header__item
-          a(href='/my/comments') Комментарии
+          a(href='/my/comments' title="Выход") Комментарии
     form.search(method='get' action='/search' autocomplete='off')
       input(type='search' name='search' placeholder='Поиск' aria-label='Поиск')
       .search__icon1
       .search__close-btn
-    a.header__avatar.avatar(href='#')
+    a.header__avatar.avatar(href='/logout')
       img(src='/img/avatar.jpg' srcset='/img/avatar@2x.jpg 2x' alt='Аватар пользователя')
     a.header__input(href='/register') Вход и регистрация

@@ -37,11 +37,11 @@ const createApi = (baseURL, timeout = API_TIMEOUT) => {
     createComment: (id, comment) => fetch(`/offers/${id}/comments`, {method: `POST`, data: comment}),
     deleteComment: (id, commentId) => fetch(`/offers/${id}/comments/${commentId}`, {method: `DELETE`}),
     createUser: (user) => fetch(`/user`, {method: `POST`, data: user}),
-    loginUser: (auth) => fetch(`/user/login`, {method: `POST`, data: auth}),
-    logoutUser: (accessToken, refreshToken) => {
+    login: (auth) => fetch(`/user/login`, {method: `POST`, data: auth}),
+    logout: (accessToken, refreshToken) => {
       return fetch(`/user/logout`, {method: `DELETE`, data: {token: refreshToken}, headers: getAuthHeaders(accessToken)});
     },
-    refreshUser: (refreshToken) => {
+    refresh: (refreshToken) => {
       return fetch(`/user/refresh`, {method: `POST`, data: {token: refreshToken}});
     }
   };

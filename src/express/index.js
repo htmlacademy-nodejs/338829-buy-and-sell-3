@@ -3,12 +3,16 @@ const express = require(`express`);
 const chalk = require(`chalk`);
 const path = require(`path`);
 
+const cookieParser = require(`cookie-parser`);
+
 const {
   DEFAULT_EXPRESS_PORT,
   EXPRESS_PUBLIC_DIR,
   EXPRESS_UPLOAD_DIR,
   HttpCode
 } = require(`../constants`);
+
+const {authenticate} = require(`./middlewares`);
 
 const rootRouter = require(`./routes/root`);
 const offersRouter = require(`./routes/offers`);
@@ -18,6 +22,8 @@ const app = express();
 
 app.use(express.static(path.resolve(__dirname, EXPRESS_PUBLIC_DIR)));
 app.use(express.static(path.resolve(__dirname, EXPRESS_UPLOAD_DIR)));
+app.use(cookieParser());
+app.use(authenticate);
 
 app.use(`/`, rootRouter);
 app.use(`/offers`, offersRouter);
@@ -28,7 +34,6 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, _next) => {
-  console.error(err);
   res.status(HttpCode.INTERNAL_SERVER_ERROR).render(`errors/500`);
 });
 

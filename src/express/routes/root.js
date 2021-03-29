@@ -3,7 +3,6 @@
 
 const express = require(`express`);
 const multer = require(`multer`);
-const cookieParser = require(`cookie-parser`);
 
 const {axiosApi} = require(`../axios-api/axios-api`);
 const {pictureUpload} = require(`../middlewares`);
@@ -14,11 +13,11 @@ const upload = multer();
 const rootRouter = new express.Router();
 
 rootRouter.use(express.urlencoded({extended: true}));
-rootRouter.use(cookieParser());
 
 rootRouter.get(`/`, async (req, res, next) => {
   try {
     const {page = 1} = req.query;
+    const {isAuth} = res.locals.auth;
 
     const limit = OFFERS_PER_PAGE;
     const offset = (Number(page) - 1) * limit;
@@ -32,6 +31,7 @@ rootRouter.get(`/`, async (req, res, next) => {
       const total = Math.ceil(count / OFFERS_PER_PAGE);
 
       return res.render(`pages/main`, {
+        isAuth,
         tickets: offers,
         categories,
         page: Number(page),
@@ -39,7 +39,7 @@ rootRouter.get(`/`, async (req, res, next) => {
       });
     }
 
-    return res.render(`pages/main-empty`);
+    return res.render(`pages/main-empty`, {isAuth});
   } catch (error) {
     return next(error);
   }
@@ -95,7 +95,7 @@ rootRouter.get(`/login`, (req, res) => {
 rootRouter.post(`/login`, upload.none(), async (req, res) => {
   const {email, password} = req.body;
   try {
-    const {accessToken, refreshToken} = await axiosApi.loginUser({email, password});
+    const {accessToken, refreshToken} = await axiosApi.login({email, password});
     res.cookie(`_ac`, accessToken);
     res.cookie(`_rf`, refreshToken);
 
@@ -109,6 +109,16 @@ rootRouter.post(`/login`, upload.none(), async (req, res) => {
       message: getErrorMessage(err.response.data.message),
     });
   }
+});
+
+rootRouter.get(`/logout`, async (req, res) => {
+  const {accessToken, refreshToken} = res.locals.auth;
+  await axiosApi.logout(accessToken, refreshToken);
+
+  res.clearCookie(`_ac`);
+  res.clearCookie(`_rf`);
+
+  return res.redirect(`/login`);
 });
 
 rootRouter.get(`/search`, async (req, res) => {
