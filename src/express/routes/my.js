@@ -2,20 +2,21 @@
 
 const {Router} = require(`express`);
 const {axiosApi} = require(`../axios-api/axios-api`);
+const {privateRoute} = require(`../middlewares`);
 
 const myRouter = new Router();
 
-myRouter.get(`/`, async (req, res, next) => {
+myRouter.get(`/`, privateRoute, async (req, res, next) => {
   try {
     const response = await axiosApi.getOffers();
     return res
-      .render(`pages/my-tickets`, {tickets: response.offers});
+      .render(`pages/my-tickets`, {tickets: response.offers, isAuth: true});
   } catch (error) {
     return next(error);
   }
 });
 
-myRouter.get(`/comments`, async (req, res, next) => {
+myRouter.get(`/comments`, privateRoute, async (req, res, next) => {
   try {
     const response = await axiosApi.getOffers({comments: true});
     const offers = response.offers.slice(0, 3);
@@ -30,7 +31,7 @@ myRouter.get(`/comments`, async (req, res, next) => {
     }));
 
     return res
-      .render(`pages/comments`, {tickets: data});
+      .render(`pages/comments`, {tickets: data, isAuth: true});
   } catch (error) {
     return next(error);
   }

@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require(`express`);
-const {pictureUpload} = require(`../middlewares`);
+const {pictureUpload, privateRoute} = require(`../middlewares`);
 const {axiosApi} = require(`../axios-api/axios-api`);
 const {HttpCode} = require(`../../constants`);
 const {getCategoryOffer, getErrorMessage} = require(`../../utils`);
@@ -24,8 +24,10 @@ offersRouter.get(`/category/:id`, async (req, res, next) => {
     ]);
 
     const total = Math.ceil(count / OFFERS_PER_PAGE);
+    const {isAuth} = res.locals.auth;
 
     return res.render(`pages/category`, {
+      isAuth,
       tickets: offers,
       categories,
       id,
@@ -37,10 +39,11 @@ offersRouter.get(`/category/:id`, async (req, res, next) => {
   }
 });
 
-offersRouter.get(`/add`, async (req, res, next) => {
+offersRouter.get(`/add`, privateRoute, async (req, res, next) => {
   try {
     const categories = await axiosApi.getCategories();
     return res.render(`pages/new-ticket`, {
+      isAuth: true,
       categories,
       newOffer: {
         categories: [],
@@ -53,7 +56,7 @@ offersRouter.get(`/add`, async (req, res, next) => {
   }
 });
 
-offersRouter.post(`/add`, pictureUpload.single(`picture`), async (req, res) => {
+offersRouter.post(`/add`, privateRoute, pictureUpload.single(`picture`), async (req, res) => {
   const {body, file} = req;
 
   const newOffer = {
@@ -71,6 +74,7 @@ offersRouter.post(`/add`, pictureUpload.single(`picture`), async (req, res) => {
   } catch (err) {
     const categories = await axiosApi.getCategories();
     return res.render(`pages/new-ticket`, {
+      isAuth: true,
       categories,
       newOffer,
       message: getErrorMessage(err.response.data.message)
@@ -78,7 +82,7 @@ offersRouter.post(`/add`, pictureUpload.single(`picture`), async (req, res) => {
   }
 });
 
-offersRouter.get(`/edit/:id`, async (req, res) => {
+offersRouter.get(`/edit/:id`, privateRoute, async (req, res) => {
   try {
     const {id} = req.params;
     const [categories, offer] = await Promise.all([
@@ -92,6 +96,7 @@ offersRouter.get(`/edit/:id`, async (req, res) => {
     };
 
     return res.render(`pages/ticket-edit`, {
+      isAuth: true,
       offerId: id,
       ticket: editOffer,
       categories,
@@ -104,7 +109,7 @@ offersRouter.get(`/edit/:id`, async (req, res) => {
   }
 });
 
-offersRouter.post(`/edit/:id`, pictureUpload.single(`picture`), async (req, res) => {
+offersRouter.post(`/edit/:id`, privateRoute, pictureUpload.single(`picture`), async (req, res) => {
   const {body, file} = req;
   const {id} = req.params;
 
@@ -123,6 +128,7 @@ offersRouter.post(`/edit/:id`, pictureUpload.single(`picture`), async (req, res)
   } catch (err) {
     const categories = await axiosApi.getCategories();
     return res.render(`pages/ticket-edit`, {
+      isAuth: true,
       offerId: id,
       ticket: editOffer,
       categories,
@@ -135,8 +141,10 @@ offersRouter.get(`/:id`, async (req, res) => {
   try {
     const {id} = req.params;
     const offer = await axiosApi.getOffer({id, comments: true});
+    const {isAuth} = res.locals.auth;
 
     return res.render(`pages/ticket`, {
+      isAuth,
       ticket: offer,
       message: {}
     });
@@ -147,7 +155,7 @@ offersRouter.get(`/:id`, async (req, res) => {
   }
 });
 
-offersRouter.post(`/:id`, async (req, res) => {
+offersRouter.post(`/:id`, privateRoute, async (req, res) => {
   const {id} = req.params;
   try {
     const {text} = req.body;
@@ -159,6 +167,7 @@ offersRouter.post(`/:id`, async (req, res) => {
     const offer = await axiosApi.getOffer({id, comments: true});
 
     return res.render(`pages/ticket`, {
+      isAuth: true,
       ticket: offer,
       message
     });

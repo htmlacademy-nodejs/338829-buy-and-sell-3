@@ -3,6 +3,7 @@
 const {Router} = require(`express`);
 const {HttpCode} = require(`../../../constants`);
 const {
+  authenticateJwt,
   idOfferValidator,
   idCommentValidator,
   offerValidator,
@@ -42,19 +43,20 @@ module.exports = (app, offersService, commentsService) => {
     }
   });
 
-  route.post(`/`, offerValidator, async (req, res, next) => {
-    try {
-      const offer = await offersService.create(req.body);
-      return res
+  route.post(`/`, [authenticateJwt, offerValidator],
+      async (req, res, next) => {
+        try {
+          const offer = await offersService.create(req.body);
+          return res
         .status(HttpCode.CREATED)
         .json({
           message: `A new offer created`,
           data: offer
         });
-    } catch (error) {
-      return next(error);
-    }
-  });
+        } catch (error) {
+          return next(error);
+        }
+      });
 
   route.get(`/:offerId`, [idOfferValidator, offerExist(offersService)], (req, res) => {
     const {offer} = res.locals;
@@ -63,62 +65,70 @@ module.exports = (app, offersService, commentsService) => {
       .json(offer);
   });
 
-  route.put(`/:offerId`, [idOfferValidator, offerExist(offersService), offerValidator], async (req, res, next) => {
-    try {
-      const {offerId} = req.params;
-      const updated = await offersService.update(offerId, req.body);
-      return res
+  route.put(`/:offerId`,
+      [authenticateJwt, idOfferValidator, offerExist(offersService), offerValidator],
+      async (req, res, next) => {
+        try {
+          const {offerId} = req.params;
+          const updated = await offersService.update(offerId, req.body);
+          return res
         .status(HttpCode.NO_CONTENT)
         .json({
           message: `Offer ${offerId} is updated`,
           data: updated
         });
-    } catch (error) {
-      return next(error);
-    }
-  });
+        } catch (error) {
+          return next(error);
+        }
+      });
 
-  route.delete(`/:offerId`, [idOfferValidator, offerExist(offersService)], async (req, res, next) => {
-    try {
-      const {offerId} = req.params;
-      const deleted = await offersService.delete(offerId);
-      return res
+  route.delete(`/:offerId`,
+      [authenticateJwt, idOfferValidator, offerExist(offersService)],
+      async (req, res, next) => {
+        try {
+          const {offerId} = req.params;
+          const deleted = await offersService.delete(offerId);
+          return res
         .status(HttpCode.NO_CONTENT)
         .send(deleted);
-    } catch (error) {
-      return next(error);
-    }
-  });
+        } catch (error) {
+          return next(error);
+        }
+      });
 
-  route.post(`/:offerId/comments`, [idOfferValidator, offerExist(offersService), commentValidator], async (req, res, next) => {
-    try {
-      const {offerId} = req.params;
-      const comment = await commentsService.create(offerId, req.body);
-      return res
+  route.post(`/:offerId/comments`,
+      [authenticateJwt, idOfferValidator, offerExist(offersService), commentValidator],
+      async (req, res, next) => {
+        try {
+          const {offerId} = req.params;
+          const comment = await commentsService.create(offerId, req.body);
+          return res
         .status(HttpCode.CREATED)
         .json({
           message: `A new comment created`,
           data: comment
         });
-    } catch (error) {
-      return next(error);
-    }
-  });
+        } catch (error) {
+          return next(error);
+        }
+      });
 
-  route.get(`/:offerId/comments`, [idOfferValidator, offerExist(offersService)], async (req, res, next) => {
-    try {
-      const {offerId} = req.params;
-      const comments = await commentsService.findAll(offerId);
-      return res
+  route.get(`/:offerId/comments`,
+      [authenticateJwt, idOfferValidator, offerExist(offersService)],
+      async (req, res, next) => {
+        try {
+          const {offerId} = req.params;
+          const comments = await commentsService.findAll(offerId);
+          return res
         .status(HttpCode.OK)
         .json(comments);
-    } catch (error) {
-      return next(error);
-    }
-  });
+        } catch (error) {
+          return next(error);
+        }
+      });
 
   route.delete(`/:offerId/comments/:commentId`,
-      [idOfferValidator, offerExist(offersService), idCommentValidator, commentExist(commentsService)],
+      [authenticateJwt, idOfferValidator, offerExist(offersService), idCommentValidator, commentExist(commentsService)],
       async (req, res, next) => {
         try {
           const {commentId} = req.params;

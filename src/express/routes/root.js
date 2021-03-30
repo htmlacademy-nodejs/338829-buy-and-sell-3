@@ -122,13 +122,13 @@ rootRouter.get(`/logout`, async (req, res) => {
 });
 
 rootRouter.get(`/search`, async (req, res) => {
+  const {isAuth} = res.locals.auth;
   try {
     const {search} = req.query;
     const tickets = await axiosApi.searchOffers(search);
-
-    return res.render(`pages/search-result`, {tickets});
+    return res.render(`pages/search-result`, {tickets, isAuth});
   } catch (error) {
-    return res.render(`pages/search-result`, {tickets: []});
+    return res.render(`pages/search-result`, {tickets: [], isAuth});
   }
 });
 
