@@ -56,7 +56,7 @@ offersRouter.get(`/add`, privateRoute, async (req, res, next) => {
   }
 });
 
-offersRouter.post(`/add`, privateRoute, pictureUpload.single(`picture`), async (req, res) => {
+offersRouter.post(`/add`, [privateRoute, pictureUpload.single(`picture`)], async (req, res) => {
   const {body, file} = req;
 
   const newOffer = {
@@ -109,7 +109,7 @@ offersRouter.get(`/edit/:id`, privateRoute, async (req, res) => {
   }
 });
 
-offersRouter.post(`/edit/:id`, privateRoute, pictureUpload.single(`picture`), async (req, res) => {
+offersRouter.post(`/edit/:id`, [privateRoute, pictureUpload.single(`picture`)], async (req, res) => {
   const {body, file} = req;
   const {id} = req.params;
 
