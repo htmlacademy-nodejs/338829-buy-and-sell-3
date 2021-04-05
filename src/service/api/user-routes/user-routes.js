@@ -35,8 +35,8 @@ module.exports = (app, usersService, tokenService) => {
 
   route.post(`/login`, [loginValidator, userAuthenticate(usersService)], async (req, res, next) => {
     try {
-      const {user} = res.locals;
-      const {accessToken, refreshToken} = jwtHelper({id: user.id});
+      const {id, avatar} = res.locals.user;
+      const {accessToken, refreshToken} = jwtHelper({id, avatar});
 
       await tokenService.add(refreshToken);
       return res
@@ -70,8 +70,8 @@ module.exports = (app, usersService, tokenService) => {
             .send(``);
         }
 
-        const {id} = userData;
-        const {accessToken, refreshToken} = jwtHelper({id});
+        const {id, avatar} = userData;
+        const {accessToken, refreshToken} = jwtHelper({id, avatar});
 
         await tokenService.delete(token);
         await tokenService.add(refreshToken);

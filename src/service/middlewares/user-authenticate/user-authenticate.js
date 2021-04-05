@@ -5,7 +5,6 @@ const {HttpCode, LoginMessage} = require(`../../../constants`);
 module.exports = (usersService) => async (req, res, next) => {
   try {
     const {email, password} = req.body;
-
     const existUser = await usersService.findByEmail(email);
     if (!existUser) {
       return res
@@ -20,7 +19,7 @@ module.exports = (usersService) => async (req, res, next) => {
         .json({message: [`"password" ${LoginMessage.WRONG_PASSWORD}`]});
     }
 
-    res.locals.user = existUser;
+    res.locals.user = existUser.dataValues;
     return next();
   } catch (error) {
     return next(error);
