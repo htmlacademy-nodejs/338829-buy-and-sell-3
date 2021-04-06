@@ -69,7 +69,8 @@ offersRouter.post(`/add`, [privateRoute, pictureUpload.single(`picture`)], async
   };
 
   try {
-    await axiosApi.createOffer(newOffer);
+    const {accessToken} = res.locals.auth;
+    await axiosApi.createOffer(newOffer, accessToken);
     return res.redirect(`/my`);
   } catch (err) {
     const categories = await axiosApi.getCategories();
@@ -123,7 +124,8 @@ offersRouter.post(`/edit/:id`, [privateRoute, pictureUpload.single(`picture`)], 
   };
 
   try {
-    await axiosApi.updateOffer(Number(id), editOffer);
+    const {accessToken} = res.locals.auth;
+    await axiosApi.updateOffer(Number(id), editOffer, accessToken);
     return res.redirect(`/my`);
   } catch (err) {
     const categories = await axiosApi.getCategories();
@@ -159,7 +161,8 @@ offersRouter.post(`/:id`, privateRoute, async (req, res) => {
   const {id} = req.params;
   try {
     const {text} = req.body;
-    await axiosApi.createComment(id, {text});
+    const {accessToken} = res.locals.auth;
+    await axiosApi.createComment(id, {text}, accessToken);
 
     return res.redirect(`/offers/${id}`);
   } catch (err) {
