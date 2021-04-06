@@ -1,6 +1,10 @@
 -
-  function getLoggedClassName() {
+  const getLoggedClassName = () => {
     return isAuth ? `header header--logged` : `header`;
+  }
+
+  const getAvatar = () => {
+    return userData && userData.avatar ? `/img/${userData.avatar}` : '/img/avatar.jpg'
   }
 
 header(class=getLoggedClassName())
@@ -18,5 +22,5 @@ header(class=getLoggedClassName())
       .search__icon1
       .search__close-btn
     a.header__avatar.avatar(href='/logout')
-      img(src='/img/avatar.jpg' srcset='/img/avatar@2x.jpg 2x' alt='Аватар пользователя')
+      img(src=getAvatar() alt='Аватар пользователя')
     a.header__input(href='/register') Вход и регистрация

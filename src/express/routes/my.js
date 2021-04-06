@@ -9,8 +9,12 @@ const myRouter = new Router();
 myRouter.get(`/`, privateRoute, async (req, res, next) => {
   try {
     const response = await axiosApi.getOffers();
-    return res
-      .render(`pages/my-tickets`, {tickets: response.offers, isAuth: true});
+    const {isAuth, userData} = res.locals.auth;
+    return res.render(`pages/my-tickets`, {
+      isAuth,
+      userData,
+      tickets: response.offers
+    });
   } catch (error) {
     return next(error);
   }
@@ -31,8 +35,14 @@ myRouter.get(`/comments`, privateRoute, async (req, res, next) => {
       comments: comments[index]
     }));
 
+    const {isAuth, userData} = res.locals.auth;
+
     return res
-      .render(`pages/comments`, {tickets: data, isAuth: true});
+      .render(`pages/comments`, {
+        isAuth,
+        userData,
+        tickets: data
+      });
   } catch (error) {
     return next(error);
   }

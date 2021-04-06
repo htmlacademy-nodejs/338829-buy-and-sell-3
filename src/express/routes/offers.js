@@ -24,10 +24,11 @@ offersRouter.get(`/category/:id`, async (req, res, next) => {
     ]);
 
     const total = Math.ceil(count / OFFERS_PER_PAGE);
-    const {isAuth} = res.locals.auth;
+    const {isAuth, userData} = res.locals.auth;
 
     return res.render(`pages/category`, {
       isAuth,
+      userData,
       tickets: offers,
       categories,
       id,
@@ -42,8 +43,11 @@ offersRouter.get(`/category/:id`, async (req, res, next) => {
 offersRouter.get(`/add`, privateRoute, async (req, res, next) => {
   try {
     const categories = await axiosApi.getCategories();
+    const {isAuth, userData} = res.locals.auth;
+
     return res.render(`pages/new-ticket`, {
-      isAuth: true,
+      isAuth,
+      userData,
       categories,
       newOffer: {
         categories: [],
@@ -73,9 +77,12 @@ offersRouter.post(`/add`, [privateRoute, pictureUpload.single(`picture`)], async
     await axiosApi.createOffer(newOffer, accessToken);
     return res.redirect(`/my`);
   } catch (err) {
+    const {isAuth, userData} = res.locals.auth;
     const categories = await axiosApi.getCategories();
+
     return res.render(`pages/new-ticket`, {
-      isAuth: true,
+      isAuth,
+      userData,
       categories,
       newOffer,
       message: getErrorMessage(err.response.data.message)
@@ -85,7 +92,9 @@ offersRouter.post(`/add`, [privateRoute, pictureUpload.single(`picture`)], async
 
 offersRouter.get(`/edit/:id`, privateRoute, async (req, res) => {
   try {
+    const {isAuth, userData} = res.locals.auth;
     const {id} = req.params;
+
     const [categories, offer] = await Promise.all([
       axiosApi.getCategories(),
       axiosApi.getOffer({id})
@@ -97,7 +106,8 @@ offersRouter.get(`/edit/:id`, privateRoute, async (req, res) => {
     };
 
     return res.render(`pages/ticket-edit`, {
-      isAuth: true,
+      isAuth,
+      userData,
       offerId: id,
       ticket: editOffer,
       categories,
@@ -129,8 +139,11 @@ offersRouter.post(`/edit/:id`, [privateRoute, pictureUpload.single(`picture`)], 
     return res.redirect(`/my`);
   } catch (err) {
     const categories = await axiosApi.getCategories();
+    const {isAuth, userData} = res.locals.auth;
+
     return res.render(`pages/ticket-edit`, {
-      isAuth: true,
+      isAuth,
+      userData,
       offerId: id,
       ticket: editOffer,
       categories,
@@ -143,10 +156,11 @@ offersRouter.get(`/:id`, async (req, res) => {
   try {
     const {id} = req.params;
     const offer = await axiosApi.getOffer({id, comments: true});
-    const {isAuth} = res.locals.auth;
+    const {isAuth, userData} = res.locals.auth;
 
     return res.render(`pages/ticket`, {
       isAuth,
+      userData,
       ticket: offer,
       message: {}
     });
@@ -168,9 +182,11 @@ offersRouter.post(`/:id`, privateRoute, async (req, res) => {
   } catch (err) {
     const message = getErrorMessage(err.response.data.message);
     const offer = await axiosApi.getOffer({id, comments: true});
+    const {isAuth, userData} = res.locals.auth;
 
     return res.render(`pages/ticket`, {
-      isAuth: true,
+      isAuth,
+      userData,
       ticket: offer,
       message
     });

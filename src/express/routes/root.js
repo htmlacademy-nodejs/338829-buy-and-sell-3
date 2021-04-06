@@ -17,7 +17,7 @@ rootRouter.use(express.urlencoded({extended: true}));
 rootRouter.get(`/`, async (req, res, next) => {
   try {
     const {page = 1} = req.query;
-    const {isAuth} = res.locals.auth;
+    const {isAuth, userData} = res.locals.auth;
 
     const limit = OFFERS_PER_PAGE;
     const offset = (Number(page) - 1) * limit;
@@ -32,6 +32,7 @@ rootRouter.get(`/`, async (req, res, next) => {
 
       return res.render(`pages/main`, {
         isAuth,
+        userData,
         tickets: offers,
         categories,
         page: Number(page),
@@ -122,13 +123,21 @@ rootRouter.get(`/logout`, async (req, res) => {
 });
 
 rootRouter.get(`/search`, async (req, res) => {
-  const {isAuth} = res.locals.auth;
+  const {isAuth, userData} = res.locals.auth;
   try {
     const {search} = req.query;
     const tickets = await axiosApi.searchOffers(search);
-    return res.render(`pages/search-result`, {tickets, isAuth});
+    return res.render(`pages/search-result`, {
+      tickets,
+      isAuth,
+      userData
+    });
   } catch (error) {
-    return res.render(`pages/search-result`, {tickets: [], isAuth});
+    return res.render(`pages/search-result`, {
+      tickets: [],
+      isAuth,
+      userData
+    });
   }
 });
 
